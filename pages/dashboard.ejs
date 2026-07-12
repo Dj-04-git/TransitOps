@@ -78,84 +78,77 @@
       </header>
 
       <main class="dash-content">
-
         <div class="content-header">
           <h1>Dashboard</h1>
         </div>
 
-        <div class="filters-row">
-          <div class="filter-select">
-            <label>Vehicle Type</label>
-            <select id="filterVehicleType">
-              <option value="all">All</option>
-            </select>
+        <section class="panel" style="max-width: 720px; margin: 0 auto;">
+          <div class="panel-header">
+            <h2>Welcome</h2>
           </div>
-          <div class="filter-select">
-            <label>Status</label>
-            <select id="filterStatus">
-              <option value="all">All</option>
-            </select>
-          </div>
-          <div class="filter-select">
-            <label>Region</label>
-            <select id="filterRegion">
-              <option value="all">All</option>
-            </select>
-          </div>
-        </div>
 
-        <!-- KPI stat cards — populated by loadKpis() in dashboard.js -->
-        <section class="stat-cards" id="statCards" aria-live="polite">
-          <div class="stat-skeleton"></div>
-          <div class="stat-skeleton"></div>
-          <div class="stat-skeleton"></div>
-          <div class="stat-skeleton"></div>
-          <div class="stat-skeleton"></div>
-          <div class="stat-skeleton"></div>
-          <div class="stat-skeleton"></div>
-        </section>
+          <div style="padding: 18px 20px 24px; display: grid; gap: 16px;">
+            <p style="margin: 0; font-size: 14px; color: #6a6f7d; letter-spacing: 0.35em; text-transform: uppercase; font-weight: 700;">
+              TransitOps / Identity
+            </p>
 
-        <section class="panels-row">
+            <h2 style="margin: 0; font-size: 38px; line-height: 1.08; letter-spacing: -0.04em; color: #101b30;">
+              Hello, <span id="displayName" style="color: #e8385f;">user</span>
+            </h2>
 
-          <!-- Recent trips — populated by loadReports() in dashboard.js -->
-          <div class="panel panel-trips">
-            <div class="panel-header">
-              <h2>Recent Trips</h2>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6a6f7d; max-width: 50ch;">
+              Your dashboard is now a simple identity view pulled from local storage.
+            </p>
+
+            <div style="display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+              <div class="panel" style="border: 1px solid #ece7d5; background: #fffdf6; box-shadow: none;">
+                <div class="panel-header">
+                  <h2 style="font-size: 12px; letter-spacing: 0.35em; text-transform: uppercase; color: #9a9a9a;">Username</h2>
+                </div>
+                <div style="padding: 0 20px 18px; font-size: 18px; font-weight: 700; color: #101b30;" id="usernameValue">user</div>
+              </div>
+
+              <div class="panel" style="border: 1px solid #ece7d5; background: #fffdf6; box-shadow: none;">
+                <div class="panel-header">
+                  <h2 style="font-size: 12px; letter-spacing: 0.35em; text-transform: uppercase; color: #9a9a9a;">Role</h2>
+                </div>
+                <div style="padding: 0 20px 18px; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: #b51f42; text-transform: capitalize;" id="roleValueWrap">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #e8385f; display: inline-block;"></span>
+                  <span id="roleValue">role</span>
+                </div>
+              </div>
             </div>
-            <table class="trips-table">
-              <thead>
-                <tr>
-                  <th>Trip</th>
-                  <th>Vehicle</th>
-                  <th>Driver</th>
-                  <th>Status</th>
-                  <th>ETA</th>
-                </tr>
-              </thead>
-              <tbody id="tripsBody">
-                <tr class="table-loading-row">
-                  <td colspan="5">Loading recent trips…</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
 
-          <!-- Vehicle status breakdown — populated by loadAnalytics() in dashboard.js -->
-          <div class="panel panel-status">
-            <div class="panel-header">
-              <h2>Vehicle Status</h2>
-            </div>
-            <div id="vehicleStatusBars" class="status-bars">
-              <div class="status-loading">Loading fleet status…</div>
-            </div>
+            <p id="emailValue" style="margin: 0; font-size: 12px; color: #9a9a9a;"></p>
           </div>
-
         </section>
 
       </main>
     </div>
   </div>
 
-  <script src="/js/dashboard.js"></script>
+  <script>
+    const rawUser = localStorage.getItem('transitops_user');
+    let user = null;
+
+    try {
+      user = rawUser ? JSON.parse(rawUser) : null;
+    } catch (error) {
+      user = null;
+    }
+
+    const email = user?.email || 'Unknown';
+    const username = typeof email === 'string' && email.includes('@')
+      ? email.split('@')[0]
+      : email || 'Unknown';
+    const role = user?.role || 'Unknown';
+
+    document.getElementById('userName').textContent = username;
+    document.getElementById('connectionStatus').innerHTML = `<span class="status-dot"></span> ${role.replace(/_/g, ' ')}`;
+    document.getElementById('displayName').textContent = username;
+    document.getElementById('usernameValue').textContent = username;
+    document.getElementById('roleValue').textContent = role.replace(/_/g, ' ');
+    document.getElementById('emailValue').textContent = `Signed in as ${email}`;
+  </script>
 </body>
 </html>
