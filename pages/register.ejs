@@ -1,106 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register · TransitOps</title>
-  <link rel="stylesheet" href="/css/style.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  />
-</head>
-<body>
+<%- include('partials/head', { title: 'Register · TransitOps' }) %>
 
-  <div class="auth-card">
+<body class="min-h-screen bg-base-200 text-base-content">
+  <main class="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto grid min-h-[calc(100vh-3rem)] max-w-6xl overflow-hidden rounded-box border border-base-300 bg-base-100 lg:grid-cols-[0.95fr_1.05fr]">
+      <section class="relative flex flex-col justify-between bg-neutral p-8 text-neutral-content lg:p-10">
+        <div class="space-y-8">
+          <div class="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.28em] text-neutral-content/70">
+            <span class="h-2 w-2 rounded-full bg-primary"></span>
+            TransitOps
+          </div>
 
-    <!-- Left: hero image panel -->
-    <div class="auth-hero">
+          <div class="space-y-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.35em] text-neutral-content/50">●──────── REGISTRATION</p>
+            <h1 class="max-w-md text-4xl font-black tracking-tight sm:text-5xl">Create an operational account for your role.</h1>
+            <p class="max-w-lg text-base leading-7 text-neutral-content/75">
+              Register with your email, password, and role. The backend stores your account in PostgreSQL and returns a JWT-compatible identity profile.
+            </p>
+          </div>
+        </div>
 
-      <div class="brand">
-        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.14)"/>
-          <path d="M9 24c3-9 8-13 11-13s8 4 11 13" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/>
-          <circle cx="9" cy="24" r="2.6" fill="#ff4d6d"/>
-          <circle cx="31" cy="24" r="2.6" fill="#ff4d6d"/>
-          <circle cx="20" cy="11" r="2.6" fill="#fff"/>
-        </svg>
-        <span class="brand-name">TransitOps</span>
-      </div>
+        <div class="grid gap-3 rounded-box border border-white/10 bg-white/5 p-4 text-sm text-neutral-content/80 sm:grid-cols-2">
+          <div>
+            <p class="text-xs uppercase tracking-[0.25em] text-neutral-content/50">Stored in database</p>
+            <p class="mt-1 font-mono text-base text-neutral-content">users.email</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-[0.25em] text-neutral-content/50">Role required</p>
+            <p class="mt-1 font-mono text-base text-neutral-content">fleet_manager / driver / safety_officer / financial_analyst</p>
+          </div>
+        </div>
+      </section>
 
-      <h1>Smart<br />Transport<br />Operations.</h1>
-      <p class="tagline">Fleet tracking, route optimization, and live dispatch — all in one operations platform.</p>
+      <section class="flex items-center justify-center p-6 sm:p-8 lg:p-10">
+        <div class="w-full max-w-xl">
+          <div class="mb-8 space-y-2">
+            <p class="text-xs font-semibold uppercase tracking-[0.35em] text-base-content/50">TransitOps / Auth</p>
+            <h2 class="text-3xl font-black tracking-tight">Register</h2>
+            <p class="text-sm leading-6 text-base-content/70">
+              Enter your credentials and role. After registration, you will be sent to the login screen.
+            </p>
+          </div>
+
+          <div id="registerAlert" class="alert mb-6 hidden"></div>
+
+          <form id="registerForm" class="space-y-5" action="/api/auth/register" method="post">
+            <label class="form-control w-full">
+              <div class="label"><span class="label-text font-semibold">Email</span></div>
+              <input id="email" name="email" type="email" class="input input-bordered w-full" placeholder="you@example.com" autocomplete="email" required />
+            </label>
+
+            <label class="form-control w-full">
+              <div class="label"><span class="label-text font-semibold">Password</span></div>
+              <input id="password" name="password" type="password" class="input input-bordered w-full" placeholder="At least 6 characters" autocomplete="new-password" required />
+            </label>
+
+            <label class="form-control w-full">
+              <div class="label"><span class="label-text font-semibold">Role</span></div>
+              <select id="role" name="role" class="select select-bordered w-full" required>
+                <option value="" selected disabled>Select your role</option>
+                <option value="fleet_manager">Fleet manager</option>
+                <option value="driver">Driver</option>
+                <option value="safety_officer">Safety officer</option>
+                <option value="financial_analyst">Financial analyst</option>
+              </select>
+            </label>
+
+            <button id="registerButton" type="submit" class="btn btn-primary w-full">Create account</button>
+          </form>
+
+          <div class="mt-6 border-t border-base-300 pt-5 text-sm text-base-content/70">
+            Already have an account?
+            <a class="link link-primary font-semibold" href="/login">Go to login</a>
+          </div>
+        </div>
+      </section>
     </div>
+  </main>
 
-    <!-- Right: register form panel -->
-    <div class="auth-form-panel">
-      <h2>Register</h2>
-      <p class="auth-subtext">
-        Already have an account?
-        <a href="/login">Sign in here</a>, it takes less than a minute.
-      </p>
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const registerAlert = document.getElementById('registerAlert');
+    const registerButton = document.getElementById('registerButton');
 
-      <% if (typeof error !== 'undefined' && error) { %>
-        <div class="form-error"><%= error %></div>
-      <% } %>
+    const showAlert = (message, type) => {
+      registerAlert.className = `alert mb-6 ${type === 'error' ? 'alert-error' : 'alert-success'}`;
+      registerAlert.textContent = message;
+      registerAlert.classList.remove('hidden');
+    };
 
-      <form action="/register" method="POST" novalidate>
+    registerForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      registerButton.disabled = true;
+      registerButton.textContent = 'Creating account...';
 
-        <div class="field">
-          <label for="name">Name</label>
-          <div class="input-row">
-            <input type="text" id="name" name="name" placeholder="Your full name"
-                   value="<%= typeof formData !== 'undefined' ? formData.name : '' %>" required />
-          </div>
-        </div>
+      try {
+        const payload = {
+          email: registerForm.email.value.trim(),
+          password: registerForm.password.value,
+          role: registerForm.role.value
+        };
 
-        <div class="field">
-          <label for="email">Email ID</label>
-          <div class="input-row">
-            <input type="email" id="email" name="email" placeholder="you@example.com"
-                   value="<%= typeof formData !== 'undefined' ? formData.email : '' %>" required />
-          </div>
-        </div>
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
 
-        <div class="field">
-          <label for="phone">Phone No</label>
-          <div class="input-row">
-            <span class="prefix">+62</span>
-            <input type="tel" id="phone" name="phone" placeholder="812 3456 7890"
-                   value="<%= typeof formData !== 'undefined' ? formData.phone : '' %>" />
-          </div>
-        </div>
+        const data = await response.json();
 
-        <div class="field">
-          <label for="password">Password</label>
-          <div class="input-row">
-            <input type="password" id="password" name="password" placeholder="••••••••" required />
-          </div>
-        </div>
+        if (!response.ok) {
+          throw new Error(data.error || 'Registration failed');
+        }
 
-        <div class="checkbox-row">
-          <input type="checkbox" id="terms" name="terms" required />
-          <label for="terms">I accept the <a href="/terms">terms and conditions</a> &amp; privacy policy</label>
-        </div>
-
-        <button type="submit" class="btn-submit">Register</button>
-      </form>
-
-      <p class="social-label">Sign up with social media</p>
-      <div class="social-row">
-        <a href="/auth/facebook" class="social-btn facebook">
-          <i class="fa-brands fa-facebook-f"></i> Facebook
-        </a>
-        <a href="/auth/twitter" class="social-btn twitter">
-          <i class="fa-brands fa-twitter"></i> Twitter
-        </a>
-        <a href="/auth/google" class="social-btn google">
-          <i class="fa-brands fa-google"></i> Google+
-        </a>
-      </div>
-    </div>
-
-  </div>
-
+        showAlert('Account created. Redirecting to login...', 'success');
+        window.setTimeout(() => {
+          window.location.href = '/login?registered=1';
+        }, 700);
+      } catch (error) {
+        showAlert(error.message, 'error');
+        registerButton.disabled = false;
+        registerButton.textContent = 'Create account';
+      }
+    });
+  </script>
 </body>
 </html>
