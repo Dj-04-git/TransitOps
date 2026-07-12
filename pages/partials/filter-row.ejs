@@ -1,0 +1,27 @@
+<div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+  <form class="grid flex-1 gap-3 sm:grid-cols-3">
+    <label class="form-control">
+      <select name="type" class="select select-bordered w-full bg-base-100">
+        <option value="">Type: All</option>
+        <% (types || []).forEach((type) => { %>
+          <option value="<%= type.value %>" <%= selectedType === type.value ? 'selected' : '' %>><%= type.label %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label class="form-control">
+      <select name="status" class="select select-bordered w-full bg-base-100">
+        <option value="">Status: All</option>
+        <% (statuses || []).forEach((status) => { %>
+          <option value="<%= status.value %>" <%= selectedStatus === status.value ? 'selected' : '' %>><%= status.label %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label class="form-control">
+      <input type="search" name="registration" placeholder="Search reg. no..." value="<%= registrationQuery || '' %>" class="input input-bordered w-full bg-base-100" />
+    </label>
+  </form>
+
+  <button class="btn btn-warning text-warning-content" type="button" onclick="document.getElementById('vehicle_modal').showModal()">+ Add Vehicle</button>
+</div>

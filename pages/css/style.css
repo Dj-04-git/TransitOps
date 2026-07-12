@@ -1,8 +1,7 @@
 /* ============================================
-   Auth pages — Register / Login
-   Matches reference: split card, aerial photo
-   left panel, minimal underline form right panel
-   ============================================ */
+  Auth pages — Register / Login
+  Styled to match the operational dashboard theme.
+  ============================================ */
 
 * {
   box-sizing: border-box;
@@ -16,7 +15,9 @@ body {
   justify-content: center;
   padding: 40px 20px;
   font-family: 'Helvetica Neue', Arial, sans-serif;
-  background: linear-gradient(135deg, #f2e94e 0%, #a8d84a 45%, #6fb02c 100%);
+  background:
+    radial-gradient(circle at top left, rgba(232, 56, 95, 0.12), transparent 32%),
+    linear-gradient(180deg, #f4f5f9 0%, #eef1f6 100%);
 }
 
 .auth-card {
@@ -25,18 +26,18 @@ body {
   min-height: 560px;
   display: flex;
   background: #fff;
-  border-radius: 18px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 40px rgba(16, 27, 48, 0.18);
 }
 
 /* ---------- Left panel ---------- */
 .auth-hero {
   flex: 1 1 46%;
   position: relative;
-  background-image:
-    linear-gradient(180deg, rgba(8, 14, 22, 0.55) 0%, rgba(8, 14, 22, 0.72) 100%),
-    url('https://images.unsplash.com/photo-1494515843206-f3117d3f51b7?auto=format&fit=crop&w=900&q=80');
+  background:
+    radial-gradient(circle at top right, rgba(232, 56, 95, 0.18), transparent 28%),
+    linear-gradient(180deg, #101b30 0%, #0c1526 100%);
   background-size: cover;
   background-position: center;
   padding: 44px 44px;
@@ -85,6 +86,15 @@ body {
   color: rgba(255, 255, 255, 0.88);
 }
 
+.auth-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 32px 32px 32px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(232, 56, 95, 0.95), rgba(255, 255, 255, 0.18));
+  opacity: 0.9;
+}
+
 /* ---------- Right panel ---------- */
 .auth-form-panel {
   flex: 1 1 54%;
@@ -98,18 +108,29 @@ body {
   margin: 0 0 8px;
   font-size: 30px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #101b30;
+}
+
+.auth-form-panel::before {
+  content: "AUTH / ACCESS CONTROL";
+  display: inline-block;
+  margin-bottom: 18px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.45px;
+  text-transform: uppercase;
+  color: #9a9fae;
 }
 
 .auth-subtext {
   margin: 0 0 30px;
   font-size: 13px;
-  color: #8a8a8a;
+  color: #6a6f7d;
   line-height: 1.5;
 }
 
 .auth-subtext a {
-  color: #3ab0ff;
+  color: #e8385f;
   text-decoration: none;
   font-weight: 600;
 }
@@ -128,7 +149,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: #9a9a9a;
+  color: #9a9fae;
   margin-bottom: 8px;
 }
 
@@ -136,7 +157,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  border-bottom: 1.5px solid #e4e4e4;
+  border-bottom: 1.5px solid #eceef3;
   padding-bottom: 8px;
   transition: border-color 0.2s ease;
 }
@@ -147,7 +168,7 @@ body {
 
 .field .prefix {
   font-size: 14px;
-  color: #333;
+  color: #101b30;
   font-weight: 600;
 }
 
@@ -156,9 +177,23 @@ body {
   border: none;
   outline: none;
   font-size: 14px;
-  color: #1a1a1a;
+  color: #101b30;
   background: transparent;
   padding: 2px 0;
+}
+
+.field select {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #101b30;
+  background: transparent;
+  padding: 2px 0;
+}
+
+.field select:invalid {
+  color: #c9c9c9;
 }
 
 .field input::placeholder {
@@ -181,11 +216,11 @@ body {
 
 .checkbox-row label {
   font-size: 12.5px;
-  color: #6a6a6a;
+  color: #6a6f7d;
 }
 
 .checkbox-row a {
-  color: #3ab0ff;
+  color: #e8385f;
   text-decoration: none;
 }
 
@@ -197,7 +232,7 @@ body {
 
 .forgot-row a {
   font-size: 12.5px;
-  color: #3ab0ff;
+  color: #e8385f;
   text-decoration: none;
 }
 
@@ -231,7 +266,7 @@ body {
 .social-label {
   margin: 28px 0 12px;
   font-size: 12px;
-  color: #9a9a9a;
+  color: #9a9fae;
 }
 
 .social-row {
@@ -260,18 +295,61 @@ body {
   filter: brightness(0.95);
 }
 
-.social-btn.facebook { background: #3b5998; }
-.social-btn.twitter { background: #55acee; }
-.social-btn.google { background: #dd4b39; }
+.social-btn.facebook {
+  background: #101b30;
+}
+
+.social-btn.twitter {
+  background: #2b6cb0;
+}
+
+.social-btn.google {
+  background: #e8385f;
+}
 
 .form-error {
-  background: #fff2f2;
-  border: 1px solid #ffd6d6;
+  background: #fff1f4;
+  border: 1px solid #f6c2ce;
   color: #c0243c;
   font-size: 12.5px;
   padding: 10px 12px;
-  border-radius: 6px;
+  border-radius: 10px;
   margin-bottom: 20px;
+}
+
+.form-error.success {
+  background: #f2fbf5;
+  border-color: #bdeccd;
+  color: #166534;
+}
+
+.hidden {
+  display: none;
+}
+
+.loading {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.loading-spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 9999px;
+  animation: loading-spin 0.7s linear infinite;
+}
+
+.loading-sm {
+  width: 0.85em;
+  height: 0.85em;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ---------- Responsive ---------- */

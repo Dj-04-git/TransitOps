@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register · TransitOps</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+<body>
+
+  <div class="auth-card">
+
+    <div class="auth-hero">
+
+      <div class="brand">
+        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.14)"/>
+          <path d="M9 24c3-9 8-13 11-13s8 4 11 13" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+          <circle cx="9" cy="24" r="2.6" fill="#ff4d6d"/>
+          <circle cx="31" cy="24" r="2.6" fill="#ff4d6d"/>
+          <circle cx="20" cy="11" r="2.6" fill="#fff"/>
+        </svg>
+        <span class="brand-name">TransitOps</span>
+      </div>
+
+      <h1>Smart<br />Transport<br />Operations.</h1>
+      <p class="tagline">Fleet tracking, route optimization, and live dispatch — all in one operations platform.</p>
+    </div>
+
+    <div class="auth-form-panel">
+      <h2>Create account</h2>
+      <p class="auth-subtext">
+        Already have an account?
+        <a href="/login">Sign in here</a>, it takes less than a minute.
+      </p>
+
+      <form id="registerForm" action="/api/auth/register" method="post" novalidate>
+
+        <div class="field">
+          <label for="email">Email address</label>
+          <div class="input-row">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="operator@company.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-row">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Minimum 6 characters"
+              minlength="6"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="role">Operational role</label>
+          <div class="input-row">
+            <select id="role" name="role" required>
+              <option value="" selected disabled>Select account role</option>
+              <option value="fleet_manager">Fleet manager</option>
+              <option value="driver">Driver</option>
+              <option value="safety_officer">Safety officer</option>
+              <option value="financial_analyst">Financial analyst</option>
+            </select>
+          </div>
+          <p class="fieldset-label">Role determines accessible operational functions.</p>
+        </div>
+
+        <div id="registerAlert" class="form-error hidden" role="alert"></div>
+
+        <button id="registerButton" type="submit" class="btn-submit">
+          Create account
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const registerAlert = document.getElementById('registerAlert');
+    const registerButton = document.getElementById('registerButton');
+
+    const showAlert = (message, type) => {
+      registerAlert.className = `form-error ${type === 'error' ? 'error' : 'success'}`;
+      registerAlert.textContent = message;
+      registerAlert.classList.remove('hidden');
+    };
+
+    registerForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      registerAlert.classList.add('hidden');
+      registerButton.disabled = true;
+      registerButton.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Creating account';
+
+      try {
+        const payload = {
+          email: registerForm.email.value.trim(),
+          password: registerForm.password.value,
+          role: registerForm.role.value
+        };
+
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Account registration failed.');
+        }
+
+        showAlert('Account created. Redirecting to login...', 'success');
+
+        setTimeout(() => {
+          window.location.href = '/login?registered=1';
+        }, 700);
+      } catch (error) {
+        showAlert(error.message, 'error');
+        registerButton.disabled = false;
+        registerButton.textContent = 'Create account';
+      }
+    });
+  </script>
+
+</body>
+</html>

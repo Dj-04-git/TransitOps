@@ -7,7 +7,7 @@ import {
   resetPassword,
   getProfile,
   updateProfile
-} from "../controllers/authController.js";
+} from "../controller/authController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();

@@ -1,81 +1,264 @@
 <%- include('partials/head', { title: 'Register · TransitOps' }) %>
 
 <body class="min-h-screen bg-base-200 text-base-content">
-  <main class="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
-    <div class="mx-auto grid min-h-[calc(100vh-3rem)] max-w-6xl overflow-hidden rounded-box border border-base-300 bg-base-100 lg:grid-cols-[0.95fr_1.05fr]">
-      <section class="relative flex flex-col justify-between bg-neutral p-8 text-neutral-content lg:p-10">
-        <div class="space-y-8">
-          <div class="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.28em] text-neutral-content/70">
-            <span class="h-2 w-2 rounded-full bg-primary"></span>
-            TransitOps
-          </div>
+  <div class="flex min-h-screen flex-col">
+    <%- include('partials/navbar', { active: '' }) %>
 
-          <div class="space-y-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.35em] text-neutral-content/50">●──────── REGISTRATION</p>
-            <h1 class="max-w-md text-4xl font-black tracking-tight sm:text-5xl">Create an operational account for your role.</h1>
-            <p class="max-w-lg text-base leading-7 text-neutral-content/75">
-              Register with your email, password, and role. The backend stores your account in PostgreSQL and returns a JWT-compatible identity profile.
+    <main class="flex flex-1 items-center">
+      <div class="mx-auto w-full max-w-7xl px-6 py-12 lg:py-16">
+        <div class="mb-8 flex items-center gap-3">
+          <span class="h-2 w-2 rounded-full bg-primary"></span>
+          <span class="h-px w-12 bg-primary"></span>
+
+          <p class="font-mono text-xs font-semibold uppercase tracking-widest text-base-content/50">
+            Auth / Account access
+          </p>
+        </div>
+
+        <div class="grid gap-8 lg:grid-cols-2 lg:gap-16">
+          <!-- Intro -->
+          <section class="flex flex-col justify-center">
+            <p class="font-mono text-xs uppercase tracking-widest text-primary">
+              TransitOps Control Network
             </p>
-          </div>
-        </div>
 
-        <div class="grid gap-3 rounded-box border border-white/10 bg-white/5 p-4 text-sm text-neutral-content/80 sm:grid-cols-2">
-          <div>
-            <p class="text-xs uppercase tracking-[0.25em] text-neutral-content/50">Stored in database</p>
-            <p class="mt-1 font-mono text-base text-neutral-content">users.email</p>
-          </div>
-          <div>
-            <p class="text-xs uppercase tracking-[0.25em] text-neutral-content/50">Role required</p>
-            <p class="mt-1 font-mono text-base text-neutral-content">fleet_manager / driver / safety_officer / financial_analyst</p>
-          </div>
-        </div>
-      </section>
+            <h1 class="mt-5 max-w-lg text-4xl font-black tracking-tight sm:text-5xl">
+              Operations access for your fleet.
+            </h1>
 
-      <section class="flex items-center justify-center p-6 sm:p-8 lg:p-10">
-        <div class="w-full max-w-xl">
-          <div class="mb-8 space-y-2">
-            <p class="text-xs font-semibold uppercase tracking-[0.35em] text-base-content/50">TransitOps / Auth</p>
-            <h2 class="text-3xl font-black tracking-tight">Register</h2>
-            <p class="text-sm leading-6 text-base-content/70">
-              Enter your credentials and role. After registration, you will be sent to the login screen.
+            <p class="mt-5 max-w-lg text-base leading-7 text-base-content/65">
+              One control system for fleet assets, dispatch operations,
+              driver compliance, and financial oversight.
             </p>
-          </div>
 
-          <div id="registerAlert" class="alert mb-6 hidden"></div>
+            <div class="mt-10 grid grid-cols-2 border-y border-base-300">
+              <div class="border-b border-r border-base-300 p-5">
+                <p class="font-mono text-xs text-primary">01</p>
+                <p class="mt-2 text-sm font-semibold">Fleet</p>
+                <p class="mt-1 text-xs text-base-content/50">
+                  Assets & maintenance
+                </p>
+              </div>
 
-          <form id="registerForm" class="space-y-5" action="/api/auth/register" method="post">
-            <label class="form-control w-full">
-              <div class="label"><span class="label-text font-semibold">Email</span></div>
-              <input id="email" name="email" type="email" class="input input-bordered w-full" placeholder="you@example.com" autocomplete="email" required />
-            </label>
+              <div class="border-b border-base-300 p-5">
+                <p class="font-mono text-xs text-primary">02</p>
+                <p class="mt-2 text-sm font-semibold">Dispatch</p>
+                <p class="mt-1 text-xs text-base-content/50">
+                  Trips & assignments
+                </p>
+              </div>
 
-            <label class="form-control w-full">
-              <div class="label"><span class="label-text font-semibold">Password</span></div>
-              <input id="password" name="password" type="password" class="input input-bordered w-full" placeholder="At least 6 characters" autocomplete="new-password" required />
-            </label>
+              <div class="border-r border-base-300 p-5">
+                <p class="font-mono text-xs text-primary">03</p>
+                <p class="mt-2 text-sm font-semibold">Safety</p>
+                <p class="mt-1 text-xs text-base-content/50">
+                  Driver compliance
+                </p>
+              </div>
 
-            <label class="form-control w-full">
-              <div class="label"><span class="label-text font-semibold">Role</span></div>
-              <select id="role" name="role" class="select select-bordered w-full" required>
-                <option value="" selected disabled>Select your role</option>
-                <option value="fleet_manager">Fleet manager</option>
-                <option value="driver">Driver</option>
-                <option value="safety_officer">Safety officer</option>
-                <option value="financial_analyst">Financial analyst</option>
-              </select>
-            </label>
+              <div class="p-5">
+                <p class="font-mono text-xs text-primary">04</p>
+                <p class="mt-2 text-sm font-semibold">Finance</p>
+                <p class="mt-1 text-xs text-base-content/50">
+                  Cost & profitability
+                </p>
+              </div>
+            </div>
 
-            <button id="registerButton" type="submit" class="btn btn-primary w-full">Create account</button>
-          </form>
+            <div class="mt-6 flex items-center gap-3">
+              <span class="h-2 w-2 rounded-full bg-success"></span>
 
-          <div class="mt-6 border-t border-base-300 pt-5 text-sm text-base-content/70">
-            Already have an account?
-            <a class="link link-primary font-semibold" href="/login">Go to login</a>
-          </div>
+              <p class="font-mono text-xs uppercase tracking-widest text-base-content/45">
+                RBAC / Operational access control active
+              </p>
+            </div>
+          </section>
+
+          <!-- Form -->
+          <section class="flex items-center lg:justify-end">
+            <div class="w-full max-w-lg border border-base-300 bg-base-100">
+              <header class="border-b border-base-300 p-6 sm:p-8">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class="font-mono text-xs uppercase tracking-widest text-base-content/45">
+                      Account provisioning
+                    </p>
+
+                    <h2 class="mt-3 text-2xl font-black tracking-tight">
+                      Create account
+                    </h2>
+
+                    <p class="mt-2 text-sm text-base-content/60">
+                      Register credentials and assign an operational role.
+                    </p>
+                  </div>
+
+                  <span class="badge badge-success badge-soft font-mono text-xs">
+                    Online
+                  </span>
+                </div>
+              </header>
+
+              <form
+                id="registerForm"
+                action="/api/auth/register"
+                method="post"
+                class="space-y-5 p-6 sm:p-8"
+              >
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">
+                    Email address
+                  </legend>
+
+                  <label class="input input-bordered flex w-full items-center gap-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4 opacity-40"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      class="grow font-mono text-sm"
+                      placeholder="operator@company.com"
+                      autocomplete="email"
+                      required
+                    />
+                  </label>
+                </fieldset>
+
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">
+                    Password
+                  </legend>
+
+                  <label class="input input-bordered flex w-full items-center gap-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4 opacity-40"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm2-10V7a4 4 0 118 0v4"
+                      />
+                    </svg>
+
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      class="grow font-mono text-sm"
+                      placeholder="Minimum 6 characters"
+                      minlength="6"
+                      autocomplete="new-password"
+                      required
+                    />
+                  </label>
+                </fieldset>
+
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">
+                    Operational role
+                  </legend>
+
+                  <select
+                    id="role"
+                    name="role"
+                    class="select select-bordered w-full"
+                    required
+                  >
+                    <option value="" selected disabled>
+                      Select account role
+                    </option>
+
+                    <option value="fleet_manager">
+                      Fleet manager
+                    </option>
+
+                    <option value="driver">
+                      Driver
+                    </option>
+
+                    <option value="safety_officer">
+                      Safety officer
+                    </option>
+
+                    <option value="financial_analyst">
+                      Financial analyst
+                    </option>
+                  </select>
+
+                  <p class="fieldset-label">
+                    Role determines accessible operational functions.
+                  </p>
+                </fieldset>
+
+                <div
+                  id="registerAlert"
+                  class="alert hidden text-sm"
+                  role="alert"
+                ></div>
+
+                <button
+                  id="registerButton"
+                  type="submit"
+                  class="btn btn-primary w-full"
+                >
+                  Create account
+
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="m9 18 6-6-6-6"
+                    />
+                  </svg>
+                </button>
+              </form>
+
+              <footer class="flex items-center justify-between border-t border-base-300 bg-base-200 px-6 py-4 text-sm sm:px-8">
+                <span class="text-base-content/55">
+                  Existing account?
+                </span>
+
+                <a
+                  href="/login"
+                  class="link link-primary font-semibold"
+                >
+                  Sign in
+                </a>
+              </footer>
+            </div>
+          </section>
         </div>
-      </section>
-    </div>
-  </main>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %>
+  </div>
 
   <script>
     const registerForm = document.getElementById('registerForm');
@@ -83,15 +266,27 @@
     const registerButton = document.getElementById('registerButton');
 
     const showAlert = (message, type) => {
-      registerAlert.className = `alert mb-6 ${type === 'error' ? 'alert-error' : 'alert-success'}`;
+      registerAlert.className =
+        `alert text-sm ${
+          type === 'error'
+            ? 'alert-error'
+            : 'alert-success'
+        }`;
+
       registerAlert.textContent = message;
       registerAlert.classList.remove('hidden');
     };
 
     registerForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+
+      registerAlert.classList.add('hidden');
       registerButton.disabled = true;
-      registerButton.textContent = 'Creating account...';
+
+      registerButton.innerHTML = `
+        <span class="loading loading-spinner loading-sm"></span>
+        Creating account
+      `;
 
       try {
         const payload = {
@@ -111,15 +306,22 @@
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Registration failed');
+          throw new Error(
+            data.error || 'Account registration failed.'
+          );
         }
 
-        showAlert('Account created. Redirecting to login...', 'success');
-        window.setTimeout(() => {
+        showAlert(
+          'Account created. Redirecting to login...',
+          'success'
+        );
+
+        setTimeout(() => {
           window.location.href = '/login?registered=1';
         }, 700);
       } catch (error) {
         showAlert(error.message, 'error');
+
         registerButton.disabled = false;
         registerButton.textContent = 'Create account';
       }
