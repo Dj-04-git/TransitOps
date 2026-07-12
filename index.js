@@ -35,31 +35,31 @@ app.use("/fleet", fleetManager )
 
 // Serve pages
 app.get("/", (req, res) => {
-  res.render("index");
+    res.render("index");
 });
 
 app.get("/login", (req, res) => {
-  res.render("login");
+    res.render("login");
 });
 
 app.get("/register", (req, res) => {
-  res.render("register");
+    res.render("register");
 });
 
 app.get("/verify-otp", (req, res) => {
-  res.render("verify-otp");
+    res.render("verify-otp");
 });
 
 app.get("/forgot-password", (req, res) => {
-  res.render("forgot-password");
+    res.render("forgot-password");
 });
 
 app.get("/reset-password", (req, res) => {
-  res.render("reset-password");
+    res.render("reset-password");
 });
 
 
 
 app.listen(5000, () => {
-  console.log("Server running on port 5000");
+    console.log("Server running on port 5000");
 });
