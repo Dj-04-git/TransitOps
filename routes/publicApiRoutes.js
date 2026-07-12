@@ -1,5 +1,9 @@
 import express from "express";
 import db from "../db.js";
+import vehicleController from "../controllers/vehicleController.js";
+import driverController from "../controllers/driverController.js";
+import tripController from "../controllers/tripController.js";
+import maintenanceController from "../controllers/maintenanceController.js";
 
 const router = express.Router();
 
@@ -27,6 +31,8 @@ router.get("/vehicles", async (req, res) => {
     return res.status(500).json({ success: false, message: "Failed to load vehicles" });
   }
 });
+
+router.get("/vehicles/available", vehicleController.getAvailableVehicles);
 
 router.get("/trips", async (req, res) => {
   try {
@@ -60,6 +66,18 @@ router.get("/trips", async (req, res) => {
   }
 });
 
+router.get("/trips/all", tripController.getTrips);
+
+router.post("/trips", tripController.createTrip);
+
+router.patch("/trips/:id/dispatch", tripController.dispatchTrip);
+
+router.patch("/trips/:id/complete", tripController.completeTrip);
+
+router.patch("/trips/:id/cancel", tripController.cancelTrip);
+
+router.get("/drivers/available", driverController.getAvailableDrivers);
+
 router.get("/fuel", async (req, res) => {
   try {
     const result = await db.query(`
@@ -85,28 +103,15 @@ router.get("/fuel", async (req, res) => {
 });
 
 router.get("/maintenance", async (req, res) => {
-  try {
-    const result = await db.query(`
-      SELECT
-        m.id,
-        m.vehicle_id,
-        v.registration_number AS "vehicleName",
-        m.service_type,
-        m.cost,
-        m.started_at,
-        m.completed_at,
-        m.status,
-        m.created_at
-      FROM maintenance_logs m
-      LEFT JOIN vehicles v ON v.id = m.vehicle_id
-      ORDER BY m.created_at DESC, m.id DESC
-    `);
+  return maintenanceController.getMaintenanceLogs(req, res);
+});
 
-    return res.json({ maintenanceLogs: result.rows });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: "Failed to load maintenance logs" });
-  }
+router.post("/maintenance", async (req, res) => {
+  return maintenanceController.createMaintenanceLog(req, res);
+});
+
+router.patch("/maintenance/:id/close", async (req, res) => {
+  return maintenanceController.closeMaintenanceLog(req, res);
 });
 
 router.get("/expenses", async (req, res) => {

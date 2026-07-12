@@ -1,20 +1,3 @@
-/* ============================================
-   TransitOps — Trip Dispatcher
-   Fetches available vehicles/drivers for the
-   create-trip form, and trips for the live board.
-   No values are hardcoded — everything renders
-   from the API responses.
-
-   NOTE: until vehicleController.js, driverController.js,
-   and tripController.js actually query the DB (they
-   currently return { success: true, message: "Not
-   implemented yet" } with no `data` field), the
-   selects/board below correctly fall back to their
-   empty states. Once the controllers return real
-   fields, update the KEY NAMES marked "adjust to
-   match your API" — nothing else needs to change.
-   ============================================ */
-
 let availableVehicles = [];
 let allTrips = [];
 
@@ -25,10 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
   loadTrips();
   setLifecycleStep('Draft');
 
+  document.getElementById('createTripBtn').addEventListener('click', openTripModal);
+  document.getElementById('closeTripModal').addEventListener('click', closeTripModal);
+  document.getElementById('cancelTripFormBtn').addEventListener('click', closeTripModal);
+  document.getElementById('tripModalOverlay').addEventListener('click', (event) => {
+    if (event.target.id === 'tripModalOverlay') closeTripModal();
+  });
+
   document.getElementById('tripVehicle').addEventListener('change', updateCapacityCheck);
   document.getElementById('cargoWeight').addEventListener('input', updateCapacityCheck);
-  document.getElementById('createTripForm').addEventListener('submit', handleCreateAndDispatch);
-  document.getElementById('cancelTripFormBtn').addEventListener('click', resetTripForm);
+  document.getElementById('createTripForm').addEventListener('submit', handleCreateTrip);
+  document.getElementById('tripSearch').addEventListener('input', renderTrips);
 });
 
 /* ---------- Helpers ---------- */
@@ -37,7 +27,7 @@ async function fetchJSON(url, options) {
   const res = await fetch(url, options);
   const body = await res.json().catch(() => null);
   if (!res.ok) {
-    throw new Error((body && body.message) || `Request failed: ${res.status}`);
+    throw new Error((body && (body.message || body.error)) || `Request failed: ${res.status}`);
   }
   return body;
 }
@@ -108,11 +98,8 @@ async function loadAvailableVehicles() {
   const select = document.getElementById('tripVehicle');
 
   try {
-    const json = await fetchJSON('/api/vehicles');
-
-    // adjust to match your API: expects { success, data: { vehicles: [...] } }
-    const vehicles = ((json && json.data && json.data.vehicles) || [])
-      .filter((v) => v.status === 'Available');
+    const json = await fetchJSON('/api/vehicles/available');
+    const vehicles = (json?.data?.vehicles || json.vehicles || []).filter((vehicle) => String(vehicle.status).toLowerCase() === 'available');
 
     availableVehicles = vehicles;
 
@@ -122,8 +109,8 @@ async function loadAvailableVehicles() {
     }
 
     select.innerHTML = vehicles.map((v) => `
-      <option value="${escapeHTML(v.id)}" data-capacity="${parseCapacityKg(v.capacity) ?? ''}">
-        ${escapeHTML(v.regNo)} — ${escapeHTML(v.capacity)} capacity
+      <option value="${escapeHTML(v.id)}" data-capacity="${parseCapacityKg(v.load_capacity || v.capacity) ?? ''}">
+        ${escapeHTML(v.registration_number || v.regNo)} — ${escapeHTML(v.load_capacity || v.capacity)} capacity
       </option>
     `).join('');
   } catch (err) {
@@ -136,11 +123,8 @@ async function loadAvailableDrivers() {
   const select = document.getElementById('tripDriver');
 
   try {
-    const json = await fetchJSON('/api/drivers');
-
-    // adjust to match your API: expects { success, data: { drivers: [...] } }
-    const drivers = ((json && json.data && json.data.drivers) || [])
-      .filter((d) => d.status === 'Available');
+    const json = await fetchJSON('/api/drivers/available');
+    const drivers = json?.data?.drivers || json.drivers || [];
 
     if (!drivers.length) {
       select.innerHTML = '<option value="">No available drivers</option>';
@@ -202,7 +186,15 @@ function updateCapacityCheck() {
 
 /* ---------- Create + dispatch trip ---------- */
 
-async function handleCreateAndDispatch(e) {
+function openTripModal() {
+  document.getElementById('tripModalOverlay').classList.add('open');
+}
+
+function closeTripModal() {
+  document.getElementById('tripModalOverlay').classList.remove('open');
+}
+
+async function handleCreateTrip(e) {
   e.preventDefault();
 
   const error = document.getElementById('tripFormError');
@@ -219,30 +211,24 @@ async function handleCreateAndDispatch(e) {
 
   error.textContent = '';
   dispatchBtn.disabled = true;
-  dispatchBtn.textContent = 'Dispatching…';
+  dispatchBtn.textContent = 'Creating…';
 
   try {
-    const created = await fetchJSON('/api/trips', {
+    await fetchJSON('/api/trips', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
 
-    // adjust to match your API: expects { success, data: { trip: { id, ... } } }
-    const tripId = created && created.data && created.data.trip && created.data.trip.id;
-
-    if (tripId) {
-      await fetchJSON(`/api/trips/${tripId}/dispatch`, { method: 'PATCH' });
-    }
-
-    setLifecycleStep('Dispatched');
+    closeTripModal();
     resetTripForm();
-    loadTrips();
+    await Promise.all([loadAvailableVehicles(), loadAvailableDrivers()]);
+    await loadTrips();
   } catch (err) {
-    console.error('Failed to create/dispatch trip:', err);
-    error.textContent = err.message || 'Could not dispatch trip. Please try again.';
+    console.error('Failed to create trip:', err);
+    error.textContent = err.message || 'Could not create trip. Please try again.';
     dispatchBtn.disabled = false;
-    dispatchBtn.textContent = 'Dispatch';
+    dispatchBtn.textContent = 'Create Trip';
   }
 }
 
@@ -251,7 +237,7 @@ function resetTripForm() {
   document.getElementById('tripFormError').textContent = '';
   document.getElementById('capacityBox').hidden = true;
   document.getElementById('dispatchTripBtn').disabled = true;
-  document.getElementById('dispatchTripBtn').textContent = 'Dispatch (disabled)';
+  document.getElementById('dispatchTripBtn').textContent = 'Create Trip';
   setLifecycleStep('Draft');
 }
 
@@ -261,48 +247,62 @@ async function loadTrips() {
   const board = document.getElementById('liveBoard');
 
   try {
-    const json = await fetchJSON('/api/trips');
-
-    // adjust to match your API: expects { success, data: { trips: [...] } }
-    const trips = (json && json.data && json.data.trips) || [];
+    const json = await fetchJSON('/api/trips/all');
+    const trips = json?.data?.trips || json.trips || [];
 
     allTrips = trips;
-
-    if (!trips.length) {
-      board.innerHTML = `<div class="status-empty">No trips yet. Create one on the left to get started.</div>`;
-      return;
-    }
-
-    board.innerHTML = trips.map(tripCardHTML).join('');
-
-    board.querySelectorAll('[data-dispatch-id]').forEach((btn) => {
-      btn.addEventListener('click', () => handleTripAction(btn.dataset.dispatchId, 'dispatch'));
-    });
-    board.querySelectorAll('[data-complete-id]').forEach((btn) => {
-      btn.addEventListener('click', () => handleTripAction(btn.dataset.completeId, 'complete'));
-    });
-    board.querySelectorAll('[data-cancel-id]').forEach((btn) => {
-      btn.addEventListener('click', () => handleTripAction(btn.dataset.cancelId, 'cancel'));
-    });
+    renderTrips();
   } catch (err) {
     console.error('Failed to load trips:', err);
     board.innerHTML = `<div class="status-empty">Couldn't load the live board right now.</div>`;
   }
 }
 
+function renderTrips() {
+  const board = document.getElementById('liveBoard');
+  const chip = document.getElementById('tripCountChip');
+  const query = document.getElementById('tripSearch').value.trim().toLowerCase();
+
+  const trips = allTrips.filter((trip) => {
+    if (!query) return true;
+    return [trip.id, trip.source, trip.destination, trip.vehicle_label, trip.driver_name, trip.status]
+      .some((value) => String(value ?? '').toLowerCase().includes(query));
+  });
+
+  chip.textContent = `${trips.length} trip${trips.length === 1 ? '' : 's'}`;
+
+  if (!trips.length) {
+    board.innerHTML = `<div class="status-empty">No trips yet. Use Create Trip to add the first one.</div>`;
+    return;
+  }
+
+  board.innerHTML = trips.map(tripCardHTML).join('');
+
+  board.querySelectorAll('[data-dispatch-id]').forEach((btn) => {
+    btn.addEventListener('click', () => handleTripAction(btn.dataset.dispatchId, 'dispatch'));
+  });
+  board.querySelectorAll('[data-complete-id]').forEach((btn) => {
+    btn.addEventListener('click', () => handleTripAction(btn.dataset.completeId, 'complete'));
+  });
+  board.querySelectorAll('[data-cancel-id]').forEach((btn) => {
+    btn.addEventListener('click', () => handleTripAction(btn.dataset.cancelId, 'cancel'));
+  });
+}
+
 function tripCardHTML(trip) {
-  const statusClass = String(trip.status || '').toLowerCase();
-  const assignment = trip.vehicleLabel
-    ? `${escapeHTML(trip.vehicleLabel)}${trip.driverName ? ' / ' + escapeHTML(trip.driverName) : ''}`
+  const status = String(trip.status || '').toLowerCase();
+  const statusClass = status.replace(/\s+/g, '-');
+  const assignment = trip.vehicle_label
+    ? `${escapeHTML(trip.vehicle_label)}${trip.driver_name ? ' / ' + escapeHTML(trip.driver_name) : ''}`
     : 'Unassigned';
 
   let actions = '';
-  if (trip.status === 'Draft') {
+  if (status === 'draft') {
     actions = `
       <button data-dispatch-id="${escapeHTML(trip.id)}">Dispatch</button>
       <button class="cancel-action" data-cancel-id="${escapeHTML(trip.id)}">Cancel</button>
     `;
-  } else if (trip.status === 'Dispatched') {
+  } else if (status === 'dispatched') {
     actions = `
       <button data-complete-id="${escapeHTML(trip.id)}">Complete</button>
       <button class="cancel-action" data-cancel-id="${escapeHTML(trip.id)}">Cancel</button>
@@ -314,20 +314,28 @@ function tripCardHTML(trip) {
       <div class="trip-card-main">
         <div class="trip-card-id">${escapeHTML(trip.id)}</div>
         <div class="trip-card-route">${escapeHTML(trip.source)} → ${escapeHTML(trip.destination)}</div>
+        <div class="trip-card-meta">${escapeHTML(trip.planned_distance_km ?? '—')} km · ${escapeHTML(trip.cargo_weight_kg ?? '—')} kg</div>
         ${actions ? `<div class="trip-card-actions">${actions}</div>` : ''}
       </div>
       <div class="trip-card-side">
         <div class="trip-card-assign">${assignment}</div>
-        <span class="trip-status-pill ${statusClass}">${escapeHTML(trip.status)}</span>
+        <span class="trip-status-pill ${statusClass}">${escapeHTML(formatStatusLabel(status))}</span>
         <div class="trip-card-note">${escapeHTML(trip.note || trip.eta || '')}</div>
       </div>
     </div>
   `;
 }
 
+function formatStatusLabel(status) {
+  return String(status || '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 async function handleTripAction(tripId, action) {
   try {
     await fetchJSON(`/api/trips/${tripId}/${action}`, { method: 'PATCH' });
+    await Promise.all([loadAvailableVehicles(), loadAvailableDrivers()]);
     loadTrips();
   } catch (err) {
     console.error(`Failed to ${action} trip:`, err);
