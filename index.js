@@ -80,7 +80,9 @@ app.get("/reset-password", (req, res) => {
     res.render("reset-password");
 });
 
-
+app.get("/fleet", (req, res) => {
+    res.render("fleet");
+});
 
 const startServer = async () => {
   try {

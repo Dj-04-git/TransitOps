@@ -44,7 +44,7 @@
         <div class="form-error"><%= error %></div>
       <% } %>
 
-      <form action="/register" method="POST" novalidate>
+      <form action="/api/auth/register" method="POST" novalidate>
 
         <div class="field">
           <label for="name">Name</label>
@@ -65,7 +65,7 @@
         <div class="field">
           <label for="phone">Phone No</label>
           <div class="input-row">
-            <span class="prefix">+62</span>
+            <span class="prefix">+91</span>
             <input type="tel" id="phone" name="phone" placeholder="812 3456 7890"
                    value="<%= typeof formData !== 'undefined' ? formData.phone : '' %>" />
           </div>
