@@ -2044,6 +2044,23 @@
     }
   }
 }
+
+html,
+body {
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-mono,
+code,
+kbd,
+pre,
+samp {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+body {
+  background: color-mix(in oklab, var(--color-base-200) 92%, white 8%);
+}
 @layer base {
   :where(:root),:root:has(input.theme-controller[value=light]:checked),[data-theme=light] {
     color-scheme: light;

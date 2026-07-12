@@ -1,88 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login · TransitOps</title>
-  <link rel="stylesheet" href="/css/style.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  />
-</head>
-<body>
+<%- include('partials/head', { title: 'Login · TransitOps' }) %>
 
-  <div class="auth-card">
+<body class="min-h-screen bg-base-200 text-base-content">
+  <main class="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto grid min-h-[calc(100vh-3rem)] max-w-6xl overflow-hidden rounded-box border border-base-300 bg-base-100 lg:grid-cols-[1.05fr_0.95fr]">
+      <section class="flex items-center justify-center border-b border-base-300 bg-base-200 p-6 lg:border-b-0 lg:border-r lg:p-10">
+        <div class="max-w-xl space-y-8">
+          <div class="space-y-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.35em] text-base-content/50">●──────── LOGIN</p>
+            <h1 class="text-4xl font-black tracking-tight sm:text-5xl">Enter your credentials and move back into the control room.</h1>
+            <p class="max-w-lg text-base leading-7 text-base-content/70">
+              Login checks your email, password, and role, then validates the returned JWT against the protected auth route before sending you to the correct page for your role.
+            </p>
+          </div>
 
-    <!-- Left: hero image panel -->
-    <div class="auth-hero">
-
-      <div class="brand">
-        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.14)"/>
-          <path d="M9 24c3-9 8-13 11-13s8 4 11 13" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/>
-          <circle cx="9" cy="24" r="2.6" fill="#ff4d6d"/>
-          <circle cx="31" cy="24" r="2.6" fill="#ff4d6d"/>
-          <circle cx="20" cy="11" r="2.6" fill="#fff"/>
-        </svg>
-        <span class="brand-name">TransitOps</span>
-      </div>
-
-      <h1>Smart<br />Transport<br />Operations.</h1>
-      <p class="tagline">Fleet tracking, route optimization, and live dispatch — all in one operations platform.</p>
-    </div>
-
-    <!-- Right: login form panel -->
-    <div class="auth-form-panel">
-      <h2>Login</h2>
-      <p class="auth-subtext">
-        Don't have an account?
-        <a href="/register">Create your account</a>, it takes less than a minute.
-      </p>
-
-      <% if (typeof error !== 'undefined' && error) { %>
-        <div class="form-error"><%= error %></div>
-      <% } %>
-
-      <form action="/login" method="POST" novalidate>
-
-        <div class="field">
-          <label for="email">Email ID</label>
-          <div class="input-row">
-            <input type="email" id="email" name="email" placeholder="you@example.com"
-                   value="<%= typeof formData !== 'undefined' ? formData.email : '' %>" required />
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-box border border-base-300 bg-base-100 p-4">
+              <p class="text-xs uppercase tracking-[0.25em] text-base-content/50">JWT</p>
+              <p class="mt-2 font-mono text-sm">Stored after login</p>
+            </div>
+            <div class="rounded-box border border-base-300 bg-base-100 p-4">
+              <p class="text-xs uppercase tracking-[0.25em] text-base-content/50">Validation</p>
+              <p class="mt-2 font-mono text-sm">Bearer token verified on /api/auth/me</p>
+            </div>
           </div>
         </div>
+      </section>
 
-        <div class="field">
-          <label for="password">Password</label>
-          <div class="input-row">
-            <input type="password" id="password" name="password" placeholder="••••••••" required />
+      <section class="flex items-center justify-center p-6 sm:p-8 lg:p-10">
+        <div class="w-full max-w-xl">
+          <div class="mb-8 space-y-2">
+            <p class="text-xs font-semibold uppercase tracking-[0.35em] text-base-content/50">TransitOps / Auth</p>
+            <h2 class="text-3xl font-black tracking-tight">Login</h2>
+            <p class="text-sm leading-6 text-base-content/70">
+              Use the same email, password, and role you registered with. Fleet managers are sent to the vehicle registry after login.
+            </p>
           </div>
+
+          <div id="loginAlert" class="alert mb-6 hidden"></div>
+
+          <% if (typeof success !== 'undefined' && success) { %>
+            <div class="alert alert-success mb-6">
+              <span><%= success %></span>
+            </div>
+          <% } %>
+
+          <form id="loginForm" class="space-y-5" action="/api/auth/login" method="post">
+            <label class="form-control w-full">
+              <div class="label"><span class="label-text font-semibold">Email</span></div>
+              <input id="email" name="email" type="email" class="input input-bordered w-full" placeholder="you@example.com" autocomplete="email" required />
+            </label>
+
+            <label class="form-control w-full">
+              <div class="label"><span class="label-text font-semibold">Password</span></div>
+              <input id="password" name="password" type="password" class="input input-bordered w-full" placeholder="Your password" autocomplete="current-password" required />
+            </label>
+
+            <label class="form-control w-full">
+              <div class="label"><span class="label-text font-semibold">Role</span></div>
+              <select id="role" name="role" class="select select-bordered w-full" required>
+                <option value="" selected disabled>Select your role</option>
+                <option value="fleet_manager">Fleet manager</option>
+                <option value="driver">Driver</option>
+                <option value="safety_officer">Safety officer</option>
+                <option value="financial_analyst">Financial analyst</option>
+              </select>
+            </label>
+
+            <div class="flex items-center justify-between gap-4 text-sm text-base-content/70">
+              <a class="link link-primary font-semibold" href="/register">Create an account</a>
+              <a class="link" href="/forgot-password">Forgot password?</a>
+            </div>
+
+            <button id="loginButton" type="submit" class="btn btn-primary w-full">Login</button>
+          </form>
         </div>
-
-        <div class="forgot-row">
-          <a href="/forgot-password">Forgot password?</a>
-        </div>
-
-        <button type="submit" class="btn-submit">Login</button>
-      </form>
-
-      <p class="social-label">Login with social media</p>
-      <div class="social-row">
-        <a href="/auth/facebook" class="social-btn facebook">
-          <i class="fa-brands fa-facebook-f"></i> Facebook
-        </a>
-        <a href="/auth/twitter" class="social-btn twitter">
-          <i class="fa-brands fa-twitter"></i> Twitter
-        </a>
-        <a href="/auth/google" class="social-btn google">
-          <i class="fa-brands fa-google"></i> Google+
-        </a>
-      </div>
+      </section>
     </div>
+  </main>
 
-  </div>
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const loginAlert = document.getElementById('loginAlert');
+    const loginButton = document.getElementById('loginButton');
 
+    const showAlert = (message, type) => {
+      loginAlert.className = `alert mb-6 ${type === 'error' ? 'alert-error' : 'alert-success'}`;
+      loginAlert.textContent = message;
+      loginAlert.classList.remove('hidden');
+    };
+
+    const validateToken = async (token) => {
+      const response = await fetch('/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('JWT validation failed');
+      }
+
+      return response.json();
+    };
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      loginButton.disabled = true;
+      loginButton.textContent = 'Validating...';
+
+      try {
+        const payload = {
+          email: loginForm.email.value.trim(),
+          password: loginForm.password.value,
+          role: loginForm.role.value
+        };
+
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        localStorage.setItem('transitops_token', data.token);
+        localStorage.setItem('transitops_user', JSON.stringify(data.user));
+
+        await validateToken(data.token);
+
+        const destination = data.user?.role === 'fleet_manager' ? '/registry' : '/';
+
+        showAlert('Login successful. Redirecting now...', 'success');
+        window.setTimeout(() => {
+          window.location.href = destination;
+        }, 700);
+      } catch (error) {
+        showAlert(error.message, 'error');
+        loginButton.disabled = false;
+        loginButton.textContent = 'Login';
+      }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('registered') === '1') {
+      showAlert('Registration completed. Sign in with your new account.', 'success');
+    }
+  </script>
 </body>
 </html>

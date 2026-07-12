@@ -11,8 +11,67 @@
       </ul>
     </div>
     <div class="navbar-end gap-2">
-      <a class="btn btn-ghost btn-sm hidden sm:inline-flex" href="#workflows">Learn more</a>
-      <a class="btn btn-primary btn-sm" href="/login">Get started</a>
+      <div id="navbarGuestActions" class="flex items-center gap-2">
+        <a class="btn btn-ghost btn-sm hidden sm:inline-flex" href="/login">Login</a>
+        <a class="btn btn-primary btn-sm" href="/register">Get started</a>
+      </div>
+      <div id="navbarAuthActions" class="hidden flex items-center gap-2">
+        <button id="navbarLogoutButton" class="btn btn-error btn-sm" type="button">Logout</button>
+      </div>
     </div>
   </div>
 </header>
+
+<script>
+  (() => {
+    const guestActions = document.getElementById('navbarGuestActions');
+    const authActions = document.getElementById('navbarAuthActions');
+    const logoutButton = document.getElementById('navbarLogoutButton');
+    const token = localStorage.getItem('transitops_token');
+
+    const setGuestState = () => {
+      guestActions?.classList.remove('hidden');
+      authActions?.classList.add('hidden');
+    };
+
+    const setAuthedState = () => {
+      guestActions?.classList.add('hidden');
+      authActions?.classList.remove('hidden');
+    };
+
+    const attachLogout = () => {
+      logoutButton?.addEventListener('click', () => {
+        localStorage.removeItem('transitops_token');
+        localStorage.removeItem('transitops_user');
+        window.location.href = '/login';
+      });
+    };
+
+    if (!token) {
+      setGuestState();
+      return;
+    }
+
+    fetch('/api/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Invalid session');
+        }
+
+        return response.json();
+      })
+      .then(() => {
+        setAuthedState();
+        attachLogout();
+      })
+      .catch(() => {
+        localStorage.removeItem('transitops_token');
+        localStorage.removeItem('transitops_user');
+        setGuestState();
+      });
+  })();
+</script>

@@ -68,6 +68,10 @@ app.get("/register", (req, res) => {
     res.render("register");
 });
 
+app.get("/registry", (req, res) => {
+  res.render("registry");
+});
+
 app.get("/verify-otp", (req, res) => {
     res.render("verify-otp");
 });
