@@ -1,19 +1,10 @@
 /* ============================================
-   TransitOps — Fleet (Vehicle Registry) loader
-   Fetches from /api/vehicles. No values are
-   hardcoded here — everything renders from the
-   API response.
+  TransitOps — Fleet (Vehicle Registry) loader
+  Fetches from /api/fleet-manager/vehicles using
+  the JWT stored in transitops_token.
+  ============================================ */
 
-   NOTE: until vehicleController.js actually
-   queries the DB (it currently returns
-   { success: true, message: "Not implemented yet" }
-   with no `data` field), the table below will
-   correctly fall back to its empty state. Once the
-   controller returns real fields, update the
-   KEY NAMES marked "adjust to match your API" —
-   nothing else needs to change.
-   ============================================ */
-
+const VEHICLE_API_URL = '/api/fleet-manager/vehicles';
 let allVehicles = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,10 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ---------- Helpers ---------- */
 
 async function fetchJSON(url, options) {
-  const res = await fetch(url, options);
+  const token = localStorage.getItem('transitops_token');
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      ...(options && options.headers ? options.headers : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
   const body = await res.json().catch(() => null);
   if (!res.ok) {
-    throw new Error((body && body.message) || `Request failed: ${res.status}`);
+    throw new Error((body && (body.error || body.message)) || `Request failed: ${res.status}`);
   }
   return body;
 }
@@ -56,12 +54,19 @@ function loadSession() {
   const nameEl = document.getElementById('userName');
   const statusEl = document.getElementById('connectionStatus');
 
-  // TODO: replace with your real "current user" source
-  const storedUser = localStorage.getItem('userName');
+  const rawUser = localStorage.getItem('transitops_user');
+  let user = null;
 
-  nameEl.textContent = storedUser || 'Guest';
+  try {
+    user = rawUser ? JSON.parse(rawUser) : null;
+  } catch (error) {
+    user = null;
+  }
 
-  if (storedUser) {
+  const displayName = user?.email ? user.email.split('@')[0] : 'Guest';
+  nameEl.textContent = displayName;
+
+  if (user) {
     statusEl.className = 'status-pill online';
     statusEl.innerHTML = '<span class="status-dot"></span> Connected';
   } else {
@@ -76,10 +81,11 @@ async function loadVehicles() {
   const tbody = document.getElementById('vehiclesBody');
 
   try {
-    const json = await fetchJSON('/api/vehicles');
+    const json = await fetchJSON(VEHICLE_API_URL);
 
-    // adjust to match your API: expects { success, data: { vehicles: [...] } }
-    const vehicles = (json && json.data && json.data.vehicles) || [];
+    const vehicles = (json && json.data && json.data.vehicles)
+      || json.vehicles
+      || [];
 
     allVehicles = vehicles;
     renderFilteredVehicles();
@@ -188,12 +194,12 @@ async function handleVehicleFormSubmit(e) {
   const vehicleId = document.getElementById('vehicleId').value;
 
   const payload = {
-    regNo: document.getElementById('regNo').value.trim(),
-    nameModel: document.getElementById('nameModel').value.trim(),
-    type: document.getElementById('vehicleType').value,
-    capacity: document.getElementById('capacity').value.trim(),
+    registrationNumber: document.getElementById('regNo').value.trim(),
+    name: document.getElementById('nameModel').value.trim(),
+    vehicleType: document.getElementById('vehicleType').value,
+    loadCapacity: document.getElementById('capacity').value.trim(),
     odometer: Number(document.getElementById('odometer').value) || 0,
-    acqCost: Number(document.getElementById('acqCost').value) || 0,
+    avgCost: Number(document.getElementById('acqCost').value) || 0,
     status: document.getElementById('vehicleStatus').value,
   };
 
@@ -203,13 +209,13 @@ async function handleVehicleFormSubmit(e) {
 
   try {
     if (vehicleId) {
-      await fetchJSON(`/api/vehicles/${vehicleId}`, {
+      await fetchJSON(`${VEHICLE_API_URL}/${vehicleId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
     } else {
-      await fetchJSON('/api/vehicles', {
+      await fetchJSON(VEHICLE_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -234,7 +240,7 @@ async function handleDeleteVehicle(vehicleId) {
   if (!confirm(`Remove ${label} from the registry?`)) return;
 
   try {
-    await fetchJSON(`/api/vehicles/${vehicleId}`, { method: 'DELETE' });
+    await fetchJSON(`${VEHICLE_API_URL}/${vehicleId}`, { method: 'DELETE' });
     loadVehicles();
   } catch (err) {
     console.error('Failed to delete vehicle:', err);
