@@ -40,24 +40,39 @@
         <a href="/register">Create your account</a>, it takes less than a minute.
       </p>
 
+      <div id="loginAlert" class="form-error hidden" role="alert"></div>
+
       <% if (typeof error !== 'undefined' && error) { %>
         <div class="form-error"><%= error %></div>
       <% } %>
 
-      <form action="/login" method="POST" novalidate>
+      <form id="loginForm" action="/api/auth/login" method="post" novalidate>
 
         <div class="field">
           <label for="email">Email ID</label>
           <div class="input-row">
             <input type="email" id="email" name="email" placeholder="you@example.com"
-                   value="<%= typeof formData !== 'undefined' ? formData.email : '' %>" required />
+                   value="<%= typeof formData !== 'undefined' ? formData.email : '' %>" autocomplete="email" required />
           </div>
         </div>
 
         <div class="field">
           <label for="password">Password</label>
           <div class="input-row">
-            <input type="password" id="password" name="password" placeholder="••••••••" required />
+            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="role">Role</label>
+          <div class="input-row">
+            <select id="role" name="role" required>
+              <option value="" selected disabled>Select your role</option>
+              <option value="fleet_manager">Fleet manager</option>
+              <option value="driver">Driver</option>
+              <option value="safety_officer">Safety officer</option>
+              <option value="financial_analyst">Financial analyst</option>
+            </select>
           </div>
         </div>
 
@@ -65,7 +80,7 @@
           <a href="/forgot-password">Forgot password?</a>
         </div>
 
-        <button type="submit" class="btn-submit">Login</button>
+        <button id="loginButton" type="submit" class="btn-submit">Login</button>
       </form>
 
       <p class="social-label">Login with social media</p>
@@ -83,6 +98,83 @@
     </div>
 
   </div>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const loginAlert = document.getElementById('loginAlert');
+    const loginButton = document.getElementById('loginButton');
+
+    const showAlert = (message, type) => {
+      loginAlert.className = `form-error ${type === 'error' ? '' : 'success'}`.trim();
+      loginAlert.textContent = message;
+      loginAlert.classList.remove('hidden');
+    };
+
+    const validateToken = async (token) => {
+      const response = await fetch('/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('JWT validation failed');
+      }
+
+      return response.json();
+    };
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      loginAlert.classList.add('hidden');
+      loginButton.disabled = true;
+      loginButton.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Validating...';
+
+      try {
+        const payload = {
+          email: loginForm.email.value.trim(),
+          password: loginForm.password.value,
+          role: loginForm.role.value
+        };
+
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        localStorage.setItem('transitops_token', data.token);
+        localStorage.setItem('transitops_user', JSON.stringify(data.user));
+
+        await validateToken(data.token);
+
+        const destination = '/dashboard';
+
+        showAlert('Login successful. Redirecting now...', 'success');
+        window.setTimeout(() => {
+          window.location.href = destination;
+        }, 700);
+      } catch (error) {
+        showAlert(error.message, 'error');
+        loginButton.disabled = false;
+        loginButton.textContent = 'Login';
+      }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('registered') === '1') {
+      showAlert('Registration completed. Sign in with your new account.', 'success');
+    }
+  </script>
 
 </body>
 </html>
