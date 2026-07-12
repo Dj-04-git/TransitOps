@@ -1,17 +1,12 @@
 /* ============================================
    TransitOps — Drivers & Safety Profiles loader
-   Fetches from /api/drivers. No values are
+  Fetches from /api/drivers. No values are
    hardcoded here — everything renders from the
    API response.
 
-   NOTE: until driverController.js actually
-   queries the DB (it currently returns
-   { success: true, message: "Not implemented yet" }
-   with no `data` field), the table below will
-   correctly fall back to its empty state. Once the
-   controller returns real fields, update the
-   KEY NAMES marked "adjust to match your API" —
-   nothing else needs to change.
+  NOTE: the API is expected to return the PostgreSQL
+  `drivers` rows with fields matching the schema in
+  `db.js`.
    ============================================ */
 
 let allDrivers = [];
@@ -52,7 +47,7 @@ function escapeHTML(str) {
 // Returns true if the expiry month has already passed.
 function isExpired(expiry) {
   if (!expiry) return false;
-  const parsed = new Date(`${expiry}-01`);
+  const parsed = new Date(expiry.length === 7 ? `${expiry}-01` : expiry);
   if (Number.isNaN(parsed.getTime())) return false;
   const now = new Date();
   const endOfExpiryMonth = new Date(parsed.getFullYear(), parsed.getMonth() + 1, 0);
@@ -61,7 +56,7 @@ function isExpired(expiry) {
 
 function formatExpiry(expiry) {
   if (!expiry) return '—';
-  const parsed = new Date(`${expiry}-01`);
+  const parsed = new Date(expiry.length === 7 ? `${expiry}-01` : expiry);
   if (Number.isNaN(parsed.getTime())) return escapeHTML(expiry);
   return parsed.toLocaleDateString(undefined, { month: '2-digit', year: 'numeric' });
 }
@@ -92,9 +87,11 @@ async function loadDrivers() {
   const tbody = document.getElementById('driversBody');
 
   try {
-    const json = await fetchJSON('/api/drivers');
+    const token = localStorage.getItem('transitops_token');
+    const json = await fetchJSON('/api/drivers', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
 
-    // adjust to match your API: expects { success, data: { drivers: [...] } }
     const drivers = (json && json.data && json.data.drivers) || [];
 
     allDrivers = drivers;
@@ -112,7 +109,7 @@ function renderFilteredDrivers() {
   const filtered = allDrivers.filter((d) => {
     if (!query) return true;
     return String(d.name || '').toLowerCase().includes(query)
-      || String(d.licenseNo || '').toLowerCase().includes(query);
+      || String(d.license_number || '').toLowerCase().includes(query);
   });
 
   if (!allDrivers.length) {
@@ -136,22 +133,30 @@ function renderFilteredDrivers() {
 }
 
 function driverRowHTML(d) {
-  const safetyClass = String(d.safety || '').toLowerCase().replace(/\s+/g, '-');
-  const statusClass = String(d.status || '').toLowerCase().replace(/\s+/g, '-');
-  const expired = isExpired(d.licenseExpiry);
+  const safetyValue = Number(d.safety_score ?? 0);
+  const completionValue = Number(d.trip_completion_percentage ?? 0);
+  const statusValue = String(d.status || '').toLowerCase();
+  const statusClass = statusValue.replace(/[\s_]+/g, '-');
+  const statusLabel = {
+    available: 'Available',
+    on_trip: 'On Trip',
+    off_duty: 'Off Duty',
+    suspended: 'Suspended'
+  }[statusValue] || statusValue;
+  const expired = isExpired(d.license_expiry_date);
 
   return `
     <tr>
       <td>${escapeHTML(d.name)}</td>
-      <td>${escapeHTML(d.licenseNo)}</td>
-      <td>${escapeHTML(d.licenseCategory)}</td>
+      <td>${escapeHTML(d.license_number)}</td>
+      <td>${escapeHTML(d.license_category)}</td>
       <td class="expiry-cell ${expired ? 'expired' : ''}">
-        ${formatExpiry(d.licenseExpiry)}${expired ? '<span class="expiry-tag">EXPIRED</span>' : ''}
+        ${formatExpiry(d.license_expiry_date)}${expired ? '<span class="expiry-tag">EXPIRED</span>' : ''}
       </td>
-      <td>${escapeHTML(d.contact)}</td>
-      <td>${d.tripCompletion != null ? escapeHTML(d.tripCompletion) : '—'}</td>
-      <td><span class="driver-status ${safetyClass}">${escapeHTML(d.safety)}</span></td>
-      <td><span class="driver-status ${statusClass}">${escapeHTML(d.status)}</span></td>
+      <td>${escapeHTML(d.contact_number)}</td>
+      <td>${Number.isFinite(completionValue) ? `${completionValue}%` : '—'}</td>
+      <td><span class="driver-status available">${Number.isFinite(safetyValue) ? `${safetyValue}%` : '—'}</span></td>
+      <td><span class="driver-status ${statusClass}">${escapeHTML(statusLabel)}</span></td>
       <td>
         <div class="row-actions">
           <button title="Edit" data-edit-id="${escapeHTML(d.id)}"><i class="fa-solid fa-pen"></i></button>
@@ -163,7 +168,6 @@ function driverRowHTML(d) {
 }
 
 /* ---------- Add / Edit modal ---------- */
-
 function openDriverModal(driverId) {
   const overlay = document.getElementById('driverModalOverlay');
   const form = document.getElementById('driverForm');
@@ -179,12 +183,13 @@ function openDriverModal(driverId) {
     if (driver) {
       document.getElementById('driverId').value = driver.id;
       document.getElementById('driverName').value = driver.name || '';
-      document.getElementById('licenseNo').value = driver.licenseNo || '';
-      document.getElementById('licenseCategory').value = driver.licenseCategory || 'LMV';
-      document.getElementById('licenseExpiry').value = driver.licenseExpiry || '';
-      document.getElementById('contact').value = driver.contact || '';
-      document.getElementById('safetyStatus').value = driver.safety || 'Available';
-      document.getElementById('driverStatus').value = driver.status || 'Available';
+      document.getElementById('licenseNo').value = driver.license_number || '';
+      document.getElementById('licenseCategory').value = driver.license_category || 'LMV';
+      document.getElementById('licenseExpiry').value = driver.license_expiry_date || '';
+      document.getElementById('contact').value = driver.contact_number || '';
+      document.getElementById('tripCompletion').value = driver.trip_completion_percentage ?? 0;
+      document.getElementById('safetyScore').value = driver.safety_score ?? 0;
+      document.getElementById('driverStatus').value = String(driver.status || 'available');
     }
   } else {
     title.textContent = 'Add Driver';
@@ -211,7 +216,8 @@ async function handleDriverFormSubmit(e) {
     licenseCategory: document.getElementById('licenseCategory').value,
     licenseExpiry: document.getElementById('licenseExpiry').value,
     contact: document.getElementById('contact').value.trim(),
-    safety: document.getElementById('safetyStatus').value,
+    safety: Number(document.getElementById('safetyScore').value),
+    tripCompletion: Number(document.getElementById('tripCompletion').value),
     status: document.getElementById('driverStatus').value,
   };
 
