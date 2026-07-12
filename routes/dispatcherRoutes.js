@@ -9,6 +9,13 @@ import expenseController from "../controllers/expenseController.js";
 
 const router = express.Router();
 
+router.get("/health", (req, res) => {
+  res.json({ message: "Dispatcher routes are available" });
+});
+
+
+
+
 /* ============================================================
    DASHBOARD
 ============================================================ */
