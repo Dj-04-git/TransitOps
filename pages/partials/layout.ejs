@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" data-theme="transitops">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <meta
+      name="description"
+      content="TransitOps smart transport operations platform"
+    />
+
+    <title><%= typeof title !== 'undefined' ? title : 'TransitOps' %></title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/app.css" />
+  </head>
+
+  <body class="min-h-screen bg-base-200 text-base-content">
+    <div class="drawer lg:drawer-open">
+      <input
+        id="application-drawer"
+        type="checkbox"
+        class="drawer-toggle"
+      />
+
+      <div class="drawer-content flex min-h-screen min-w-0 flex-col">
+        <%- include('topbar', {
+          userName:
+            typeof userName !== 'undefined'
+              ? userName
+              : 'TransitOps User',
+
+          userRole:
+            typeof userRole !== 'undefined'
+              ? userRole
+              : '',
+
+          userInitials:
+            typeof userInitials !== 'undefined'
+              ? userInitials
+              : 'TO'
+        }) %>
+
+        <main class="min-w-0 flex-1">
+          <div class="mx-auto w-full max-w-[1600px] p-5 sm:p-6 lg:p-8">
+            <%- body %>
+          </div>
+        </main>
+      </div>
+
+      <div class="drawer-side z-50">
+        <label
+          for="application-drawer"
+          aria-label="Close navigation"
+          class="drawer-overlay"
+        ></label>
+
+        <%- include('sidebar', {
+          activePage:
+            typeof activePage !== 'undefined'
+              ? activePage
+              : ''
+        }) %>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        const token = localStorage.getItem('transitops_token');
+
+        if (!token) {
+          window.location.href = '/login';
+          return;
+        }
+
+        fetch('/api/auth/me', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Invalid session');
+            }
+
+            return response.json();
+          })
+          .catch(() => {
+            localStorage.removeItem('transitops_token');
+            localStorage.removeItem('transitops_user');
+
+            window.location.href = '/login';
+          });
+      })();
+    </script>
+
+    <%- typeof scripts !== 'undefined' ? scripts : '' %>
+  </body>
+</html>

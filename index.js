@@ -11,6 +11,7 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 import express from "express";
 import cors from "cors";
 import { config } from "./config.js";
+import ejsMate from 'ejs-mate';
 import db, { initDatabase } from "./db.js";
 
 import authRoutes from "./routes/authRoutes.js";
@@ -25,6 +26,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 // Set view engine to EJS
+app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'pages'));
 
