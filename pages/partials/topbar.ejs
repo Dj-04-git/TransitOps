@@ -1,0 +1,22 @@
+<header class="flex flex-col gap-4 border-b border-base-300 bg-base-100/90 px-5 py-4 backdrop-blur md:flex-row md:items-center md:justify-between">
+  <div class="flex flex-1 items-center gap-3">
+    <label class="input input-bordered flex w-full max-w-sm items-center gap-2 bg-base-100">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m1.1-5.15a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+      </svg>
+      <input type="search" name="search" placeholder="Search..." value="<%= query || '' %>" class="grow" />
+    </label>
+  </div>
+
+  <div class="flex items-center justify-between gap-4 md:justify-end">
+    <div class="text-right">
+      <p class="text-sm font-semibold"><%= userName || 'Raven K.' %></p>
+      <p class="text-xs text-base-content/50"><%= userRole || 'Dispatcher' %></p>
+    </div>
+    <div class="avatar placeholder">
+      <div class="w-10 rounded-full bg-primary text-primary-content">
+        <span class="text-sm font-bold"><%= userInitials || 'RK' %></span>
+      </div>
+    </div>
+  </div>
+</header>
