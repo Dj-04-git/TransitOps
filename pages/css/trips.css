@@ -1,0 +1,225 @@
+/* ============================================
+   TransitOps — Trip Dispatcher
+   Extends dashboard.css + fleet.css.
+   ============================================ */
+
+/* ---------- Lifecycle stepper ---------- */
+.lifecycle-wrap {
+  margin-bottom: 22px;
+}
+
+.lifecycle-label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #9a9fae;
+  margin-bottom: 10px;
+}
+
+.lifecycle-stepper {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 1px 3px rgba(16, 27, 48, 0.05);
+}
+
+.lifecycle-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.lifecycle-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #dfe2e9;
+  display: inline-block;
+}
+
+.lifecycle-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #9a9fae;
+}
+
+.lifecycle-line {
+  flex: 1;
+  height: 2px;
+  background: #eceef3;
+  margin: 0 12px;
+}
+
+.lifecycle-step.done .lifecycle-dot { background: #2ecc71; }
+.lifecycle-step.done .lifecycle-name { color: #1e9e51; }
+
+.lifecycle-step.current .lifecycle-dot {
+  background: #3ab0ff;
+  box-shadow: 0 0 0 4px rgba(58, 176, 255, 0.18);
+}
+.lifecycle-step.current .lifecycle-name { color: #101b30; font-weight: 700; }
+
+.lifecycle-step.cancelled .lifecycle-dot { background: #e8385f; }
+.lifecycle-step.cancelled .lifecycle-name { color: #d43a52; }
+
+/* ---------- Two-column layout ---------- */
+.trips-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .trips-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.create-trip-panel .trip-form {
+  padding: 18px 20px 20px;
+}
+
+.trip-form-footer {
+  padding-top: 4px;
+}
+
+/* ---------- Capacity validation box ---------- */
+.capacity-box {
+  border: 1px solid #eceef3;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: #4a4f5c;
+  background: #f9fafc;
+  line-height: 1.6;
+}
+
+.capacity-box.ok {
+  border-color: #bdeccd;
+  background: #f2fbf5;
+}
+
+.capacity-box.blocked {
+  border-color: #f6c2ce;
+  background: #fdeef1;
+  color: #b8283e;
+}
+
+.capacity-box .capacity-status-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* ---------- Live board ---------- */
+.live-board {
+  padding: 6px 20px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.trip-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px dashed #eceef3;
+  gap: 16px;
+}
+
+.trip-card:last-child {
+  border-bottom: none;
+}
+
+.trip-card-main {
+  min-width: 0;
+}
+
+.trip-card-id {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #101b30;
+  margin-bottom: 2px;
+}
+
+.trip-card-route {
+  font-size: 13px;
+  color: #4a4f5c;
+  margin-bottom: 8px;
+}
+
+.trip-card-assign {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9a9fae;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-align: right;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.trip-card-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.trip-card-note {
+  font-size: 11.5px;
+  color: #9a9fae;
+  white-space: nowrap;
+}
+
+.trip-status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.trip-status-pill.draft { background: #eef0f4; color: #6a6f7d; }
+.trip-status-pill.dispatched { background: #e6f4ff; color: #1a86e0; }
+.trip-status-pill.completed { background: #e9f9ee; color: #1e9e51; }
+.trip-status-pill.cancelled { background: #fdecee; color: #d43a52; }
+
+.trip-card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.trip-card-actions button {
+  border: 1px solid #e3e5ec;
+  background: #fff;
+  color: #4a4f5c;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.trip-card-actions button:hover {
+  background: #f4f5f9;
+}
+
+.trip-card-actions .cancel-action:hover {
+  color: #d43a52;
+  border-color: #f6c2ce;
+}
+
+/* ---------- Footnote ---------- */
+.lifecycle-footnote {
+  margin-top: 16px;
+}

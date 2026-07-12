@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fleet · TransitOps</title>
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/fleet.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+<body>
+
+  <div class="dash-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="20" fill="rgba(232,56,95,0.12)"/>
+          <path d="M9 24c3-9 8-13 11-13s8 4 11 13" stroke="#e8385f" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+          <circle cx="9" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="31" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="20" cy="11" r="2.6" fill="#101b30"/>
+        </svg>
+        <span class="brand-name">TransitOps</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="nav-item">
+          <i class="fa-solid fa-gauge"></i> Dashboard
+        </a>
+        <a href="/fleet" class="nav-item active">
+          <i class="fa-solid fa-truck"></i> Fleet
+        </a>
+        <a href="/drivers" class="nav-item">
+          <i class="fa-solid fa-id-card"></i> Drivers
+        </a>
+        <a href="/trips" class="nav-item">
+          <i class="fa-solid fa-route"></i> Trips
+        </a>
+        <a href="/maintenance" class="nav-item">
+          <i class="fa-solid fa-screwdriver-wrench"></i> Maintenance
+        </a>
+        <a href="/fuel-expenses" class="nav-item">
+          <i class="fa-solid fa-gas-pump"></i> Fuel &amp; Expenses
+        </a>
+        <a href="/analytics" class="nav-item">
+          <i class="fa-solid fa-chart-line"></i> Analytics
+        </a>
+        <a href="/settings" class="nav-item">
+          <i class="fa-solid fa-gear"></i> Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="dash-main">
+
+      <header class="topbar">
+        <div class="topbar-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search vehicles, drivers, trips…" id="globalSearch" />
+        </div>
+
+        <div class="topbar-right">
+          <button class="icon-btn" title="Notifications">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+          <div class="user-block">
+            <span class="user-name" id="userName">—</span>
+            <span class="status-pill" id="connectionStatus">
+              <span class="status-dot"></span> Connecting…
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="dash-content">
+
+        <div class="content-header content-header-row">
+          <h1>Fleet</h1>
+          <button class="btn-primary" id="addVehicleBtn">
+            <i class="fa-solid fa-plus"></i> Add Vehicle
+          </button>
+        </div>
+
+        <div class="filters-row fleet-filters-row">
+          <div class="filter-select">
+            <label>Type</label>
+            <select id="filterVehicleType">
+              <option value="all">All</option>
+              <option value="Van">Van</option>
+              <option value="Truck">Truck</option>
+              <option value="Mini">Mini</option>
+              <option value="Bus">Bus</option>
+              <option value="Car">Car</option>
+            </select>
+          </div>
+          <div class="filter-select">
+            <label>Status</label>
+            <select id="filterStatus">
+              <option value="all">All</option>
+              <option value="Available">Available</option>
+              <option value="On Trip">On Trip</option>
+              <option value="In Shop">In Shop</option>
+              <option value="Retired">Retired</option>
+            </select>
+          </div>
+          <div class="filter-select reg-search-wrap">
+            <label>&nbsp;</label>
+            <input type="text" id="regSearch" class="reg-search-input" placeholder="Search reg. no…" />
+          </div>
+        </div>
+
+        <!-- Vehicle registry table — populated by loadVehicles() in fleet.js -->
+        <section class="panel panel-fleet">
+          <table class="vehicles-table">
+            <thead>
+              <tr>
+                <th>Reg. No.</th>
+                <th>Name/Model</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Odometer</th>
+                <th>Acq. Cost</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="vehiclesBody">
+              <tr class="table-loading-row">
+                <td colspan="8">Loading vehicles…</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <p class="table-note">
+          Rule: Registration No. must be unique · Retired/In Shop vehicles are hidden from Trip Dispatcher.
+        </p>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Add / Edit Vehicle Modal -->
+  <div class="modal-overlay" id="vehicleModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="vehicleModalTitle">Add Vehicle</h2>
+        <button class="icon-btn" id="closeVehicleModal" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="vehicleForm" class="modal-body">
+        <input type="hidden" id="vehicleId" />
+
+        <div class="form-row">
+          <label for="regNo">Registration No.</label>
+          <input type="text" id="regNo" required placeholder="e.g. GJ01AB4552" />
+        </div>
+
+        <div class="form-row">
+          <label for="nameModel">Name/Model</label>
+          <input type="text" id="nameModel" required placeholder="e.g. Van-05" />
+        </div>
+
+        <div class="form-row form-row-split">
+          <div>
+            <label for="vehicleType">Type</label>
+            <select id="vehicleType" required>
+              <option value="Van">Van</option>
+              <option value="Truck">Truck</option>
+              <option value="Mini">Mini</option>
+              <option value="Bus">Bus</option>
+              <option value="Car">Car</option>
+            </select>
+          </div>
+          <div>
+            <label for="capacity">Capacity</label>
+            <input type="text" id="capacity" placeholder="e.g. 500 kg" />
+          </div>
+        </div>
+
+        <div class="form-row form-row-split">
+          <div>
+            <label for="odometer">Odometer (km)</label>
+            <input type="number" id="odometer" min="0" placeholder="e.g. 74000" />
+          </div>
+          <div>
+            <label for="acqCost">Acquisition Cost</label>
+            <input type="number" id="acqCost" min="0" placeholder="e.g. 620000" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="vehicleStatus">Status</label>
+          <select id="vehicleStatus" required>
+            <option value="Available">Available</option>
+            <option value="On Trip">On Trip</option>
+            <option value="In Shop">In Shop</option>
+            <option value="Retired">Retired</option>
+          </select>
+        </div>
+
+        <p class="form-error" id="vehicleFormError"></p>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelVehicleModal">Cancel</button>
+          <button type="submit" class="btn-primary" id="saveVehicleBtn">Save Vehicle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/fleet.js"></script>
+</body>
+</html>
