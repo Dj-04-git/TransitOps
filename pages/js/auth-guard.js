@@ -49,6 +49,40 @@
   const role = String(user.role || '').toLowerCase();
   const roleLabel = ROLE_LABELS[role] || role || 'Unknown';
 
+  /* ---------- Page-level authorization (RBAC) ----------
+     Which roles may open which page. Dashboard is common
+     to everyone; every other page is role-scoped. */
+  const PAGE_ACCESS = {
+    '/dashboard': ['fleet_manager', 'driver', 'safety_officer', 'financial_analyst'],
+    '/fleet': ['fleet_manager'],
+    '/maintenance': ['fleet_manager', 'safety_officer'],
+    '/settings': ['fleet_manager'],
+    '/trips': ['driver'],
+    '/drivers': ['driver', 'safety_officer'],
+    '/analytics': ['financial_analyst'],
+    '/fuel-expenses': ['financial_analyst'],
+  };
+
+  function canAccess(path) {
+    const key = String(path || '').replace(/\/+$/, '') || '/dashboard';
+    const allowed = PAGE_ACCESS[key];
+    return !allowed || allowed.includes(role);
+  }
+
+  // Enforce immediately: bounce to the common dashboard if this
+  // role isn't allowed on the current page.
+  if (!canAccess(location.pathname)) {
+    window.location.replace('/dashboard');
+    return;
+  }
+
+  // Trim the sidebar to only the pages this role can open.
+  function filterSidebar() {
+    document.querySelectorAll('.sidebar-nav a[href]').forEach((a) => {
+      if (!canAccess(a.getAttribute('href'))) a.remove();
+    });
+  }
+
   function logout() {
     localStorage.removeItem('transitops_token');
     localStorage.removeItem('transitops_user');
@@ -122,6 +156,11 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     paintChrome();
+    filterSidebar();
     applyRoleGating(document);
   });
+
+  // Expose the access map for page scripts that want it.
+  window.TransitOpsAuth.PAGE_ACCESS = PAGE_ACCESS;
+  window.TransitOpsAuth.canAccess = canAccess;
 })();
