@@ -1,0 +1,18 @@
+<header class="sticky top-0 z-50 border-b border-base-300 bg-base-100/80 backdrop-blur">
+  <div class="navbar container mx-auto max-w-7xl px-6">
+    <div class="navbar-start">
+      <a class="btn btn-ghost text-xl font-black tracking-tight" href="/">TransitOps</a>
+    </div>
+    <div class="navbar-center hidden lg:flex">
+      <ul class="menu menu-horizontal px-1 text-base-content/70">
+        <li><a href="#overview" class="<%= active === 'home' ? 'active' : '' %>">Overview</a></li>
+        <li><a href="#workflows">Workflows</a></li>
+        <li><a href="#overview">Features</a></li>
+      </ul>
+    </div>
+    <div class="navbar-end gap-2">
+      <a class="btn btn-ghost btn-sm hidden sm:inline-flex" href="#workflows">Learn more</a>
+      <a class="btn btn-primary btn-sm" href="#overview">Get started</a>
+    </div>
+  </div>
+</header>
