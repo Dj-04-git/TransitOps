@@ -9,10 +9,15 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 
 import express from "express";
 import cors from "cors";
+import { config } from "./config.js";
+import db, { initDatabase } from "./db.js";
 
 import authRoutes from "./routes/authRoutes.js";
+import fleetManagerRoutes from "./routes/fleetManagerRoutes.js";
+import driverRoutes from "./routes/driverRoutes.js";
+import safetyOfficerRoutes from "./routes/safetyOfficerRoutes.js";
+import financialAnalystRoutes from "./routes/financialAnalystRoutes.js";
 
-dotenv.config();
 const app = express();
 
 app.use(cors());
@@ -26,6 +31,27 @@ app.set('views', path.join(__dirname, 'pages'));
 app.use(express.static(path.join(__dirname, "pages")));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/fleet-manager", fleetManagerRoutes);
+app.use("/api/driver", driverRoutes);
+app.use("/api/safety-officer", safetyOfficerRoutes);
+app.use("/api/financial-analyst", financialAnalystRoutes);
+
+app.get("/api/health/db", async (req, res) => {
+  try {
+    const result = await db.query("SELECT NOW() AS server_time");
+    return res.json({
+      ok: true,
+      message: "Database connected",
+      serverTime: result.rows[0].server_time
+    });
+  } catch (error) {
+    console.error("Database health check failed:", error);
+    return res.status(500).json({
+      ok: false,
+      message: "Database connection failed"
+    });
+  }
+});
 
 
 // Serve pages
@@ -55,6 +81,18 @@ app.get("/reset-password", (req, res) => {
 
 
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
+const startServer = async () => {
+  try {
+    await initDatabase();
+    console.log("PostgreSQL connection and schema initialization successful");
+
+    app.listen(config.PORT, () => {
+      console.log(`Server running on port ${config.PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to connect to PostgreSQL:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
