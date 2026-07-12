@@ -53,6 +53,15 @@ function extractList(json, key) {
   return [];
 }
 
+function extractListByKeys(json, keys) {
+  for (const key of keys) {
+    const list = extractList(json, key);
+    if (list.length) return list;
+  }
+
+  return [];
+}
+
 function escapeHTML(str) {
   return String(str ?? '').replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -101,7 +110,7 @@ async function loadVehicleSelect() {
 
   try {
     const json = await fetchJSON(VEHICLE_LIST_URL);
-    const vehicles = extractList(json, 'vehicles');
+    const vehicles = extractListByKeys(json, ['vehicles', 'data']);
 
     const html = vehicles.length
       ? vehicles.map(vehicleOptionHTML).join('')
@@ -118,7 +127,7 @@ async function loadVehicleSelect() {
 
 function vehicleOptionHTML(vehicle) {
   const id = vehicle.id || vehicle._id;
-  const label = vehicle.registrationNumber || vehicle.name || id;
+  const label = vehicle.registration_number || vehicle.registrationNumber || vehicle.name || id;
   return `<option value="${escapeHTML(id)}">${escapeHTML(label)}</option>`;
 }
 
@@ -127,7 +136,7 @@ async function loadTripSelect() {
 
   try {
     const json = await fetchJSON(TRIP_LIST_URL);
-    const trips = extractList(json, 'trips');
+    const trips = extractListByKeys(json, ['trips', 'data']);
 
     select.innerHTML = trips.length
       ? trips.map(tripOptionHTML).join('')
@@ -154,7 +163,7 @@ async function loadFuelLog() {
 
   try {
     const json = await fetchJSON(FUEL_URL);
-    fuelRecordsCache = extractList(json, 'records');
+    fuelRecordsCache = extractListByKeys(json, ['fuelLogs', 'records', 'data']);
 
     tbody.innerHTML = fuelRecordsCache.length
       ? fuelRecordsCache.map(fuelRowHTML).join('')
@@ -168,14 +177,14 @@ async function loadFuelLog() {
 }
 
 function fuelRowHTML(record) {
-  const vehicleLabel = (record.vehicle && (record.vehicle.registrationNumber || record.vehicle.name))
-    || record.vehicleName || '—';
+  const vehicleLabel = (record.vehicle && (record.vehicle.registration_number || record.vehicle.registrationNumber || record.vehicle.name))
+    || record.vehicleName || record.vehicle_id || '—';
 
   return `
     <tr>
       <td>${escapeHTML(vehicleLabel)}</td>
-      <td>${formatDate(record.date)}</td>
-      <td>${escapeHTML(record.quantity)} L</td>
+      <td>${formatDate(record.refueled_at || record.date)}</td>
+      <td>${escapeHTML(record.liters ?? record.quantity)} L</td>
       <td>${formatCurrency(record.cost)}</td>
     </tr>
   `;
@@ -189,13 +198,13 @@ async function handleCreateFuel(e) {
   errorBox.hidden = true;
 
   const payload = {
-    vehicle: document.getElementById('fuelVehicleSelect').value,
-    quantity: Number(document.getElementById('fuelQuantity').value),
+    vehicle_id: document.getElementById('fuelVehicleSelect').value,
+    liters: Number(document.getElementById('fuelQuantity').value),
     cost: Number(document.getElementById('fuelCost').value),
-    date: document.getElementById('fuelDate').value,
+    refueled_at: document.getElementById('fuelDate').value,
   };
 
-  if (!payload.vehicle) {
+  if (!payload.vehicle_id) {
     errorBox.textContent = 'Select a vehicle before saving.';
     errorBox.hidden = false;
     return;
@@ -232,7 +241,7 @@ async function loadExpenses() {
 
   try {
     const json = await fetchJSON(EXPENSE_URL);
-    const expenses = extractList(json, 'expenses');
+    const expenses = extractListByKeys(json, ['expenses', 'data']);
 
     tbody.innerHTML = expenses.length
       ? expenses.map(expenseRowHTML).join('')
@@ -245,10 +254,13 @@ async function loadExpenses() {
 
 function expenseRowHTML(expense) {
   const tripLabel = (expense.trip && (expense.trip.reference || expense.trip.code))
-    || expense.tripLabel || '—';
-  const vehicleLabel = (expense.vehicle && (expense.vehicle.registrationNumber || expense.vehicle.name))
-    || expense.vehicleName || '—';
-  const total = Number(expense.toll || 0) + Number(expense.misc || 0);
+    || expense.tripLabel || expense.trip_id || '—';
+  const vehicleLabel = (expense.vehicle && (expense.vehicle.registration_number || expense.vehicle.registrationNumber || expense.vehicle.name))
+    || expense.vehicleName || expense.vehicle_id || '—';
+  const otherCost = Number(expense.other ?? expense.misc ?? 0);
+  const maintenanceCost = Number(expense.maintenance_cost ?? 0);
+  const fuelCost = Number(expense.fuel_cost ?? 0);
+  const total = Number(expense.total_cost ?? (Number(expense.toll || 0) + otherCost + maintenanceCost + fuelCost));
   const status = expense.status || 'Pending';
   const statusClass = String(status).toLowerCase().replace(/\s+/g, '-');
 
@@ -257,7 +269,7 @@ function expenseRowHTML(expense) {
       <td>${escapeHTML(tripLabel)}</td>
       <td>${escapeHTML(vehicleLabel)}</td>
       <td>${formatCurrency(expense.toll)}</td>
-      <td>${formatCurrency(expense.misc)}</td>
+      <td>${formatCurrency(otherCost)}</td>
       <td>${formatCurrency(total)}</td>
       <td><span class="trip-status ${statusClass}">${escapeHTML(status)}</span></td>
     </tr>
@@ -272,14 +284,17 @@ async function handleCreateExpense(e) {
   errorBox.hidden = true;
 
   const payload = {
-    trip: document.getElementById('expenseTripSelect').value,
-    vehicle: document.getElementById('expenseVehicleSelect').value,
+    trip_id: document.getElementById('expenseTripSelect').value,
+    vehicle_id: document.getElementById('expenseVehicleSelect').value,
     toll: Number(document.getElementById('expenseToll').value) || 0,
-    misc: Number(document.getElementById('expenseMisc').value) || 0,
-    date: document.getElementById('expenseDate').value,
+    other: Number(document.getElementById('expenseMisc').value) || 0,
+    maintenance_cost: 0,
+    fuel_cost: 0,
+    total_cost: (Number(document.getElementById('expenseToll').value) || 0) + (Number(document.getElementById('expenseMisc').value) || 0),
+    expense_date: document.getElementById('expenseDate').value,
   };
 
-  if (!payload.trip || !payload.vehicle) {
+  if (!payload.trip_id || !payload.vehicle_id) {
     errorBox.textContent = 'Select a trip and a vehicle before saving.';
     errorBox.hidden = false;
     return;
@@ -316,7 +331,7 @@ async function refreshTotalCost() {
 
   try {
     const maintJson = await fetchJSON(MAINTENANCE_URL);
-    const maintRecords = extractList(maintJson, 'records');
+    const maintRecords = extractListByKeys(maintJson, ['maintenanceLogs', 'records', 'data']);
 
     const fuelTotal = sumBy(fuelRecordsCache, (r) => r.cost);
     const maintTotal = sumBy(maintRecords, (r) => r.cost);
