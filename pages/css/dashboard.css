@@ -90,6 +90,28 @@ a {
   box-shadow: inset 3px 0 0 #e8385f;
 }
 
+/* ---------- Sidebar footer / logout ---------- */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logout-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  color: #e8385f;
+}
+
+.logout-btn:hover {
+  background: rgba(232, 56, 95, 0.16);
+  color: #fff;
+}
+
 /* ---------- Main column ---------- */
 .dash-main {
   flex: 1;
@@ -437,3 +459,47 @@ a {
     padding: 20px;
   }
 }
+
+/* ============================================
+   Dark mode — shared shell
+   Activates when <html data-theme="dark"> is set
+   (see /js/auth-guard.js). Pages that include the
+   guard get app-wide theming for free.
+   ============================================ */
+:root[data-theme="dark"] body { background: #0e1526; color: #cfd6e4; }
+:root[data-theme="dark"] .dash-shell { background: #0e1526; }
+:root[data-theme="dark"] .topbar {
+  background: #101b30;
+  border-bottom-color: #1e2a44;
+}
+:root[data-theme="dark"] .topbar-search { background: #17223a; color: #8a93a8; }
+:root[data-theme="dark"] .topbar-search input { color: #e6ebf5; }
+:root[data-theme="dark"] .user-name { color: #e6ebf5; }
+:root[data-theme="dark"] .icon-btn { color: #a8b1c4; }
+:root[data-theme="dark"] .icon-btn:hover { background: #1e2a44; }
+:root[data-theme="dark"] .dash-content { background: #0e1526; }
+:root[data-theme="dark"] .content-header h1,
+:root[data-theme="dark"] .content-header-row h1 { color: #f4f6fb; }
+:root[data-theme="dark"] .panel {
+  background: #131d33;
+  box-shadow: none;
+  border: 1px solid #1e2a44;
+}
+:root[data-theme="dark"] .panel-header h2 { color: #f4f6fb; }
+:root[data-theme="dark"] .stat-card { background: #131d33; box-shadow: none; }
+:root[data-theme="dark"] .stat-value { color: #f4f6fb; }
+:root[data-theme="dark"] .stat-label { color: #8a93a8; }
+:root[data-theme="dark"] .trips-table thead th,
+:root[data-theme="dark"] .vehicles-table thead th { border-bottom-color: #1e2a44; }
+:root[data-theme="dark"] .trips-table tbody td,
+:root[data-theme="dark"] .vehicles-table tbody td {
+  color: #cfd6e4;
+  border-bottom-color: #1e2a44;
+}
+:root[data-theme="dark"] .filter-select select {
+  background: #17223a;
+  border-color: #1e2a44;
+  color: #e6ebf5;
+}
+:root[data-theme="dark"] .status-bar-track { background: #1e2a44; }
+:root[data-theme="dark"] .table-note { color: #8a93a8; }

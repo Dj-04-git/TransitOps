@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics · TransitOps</title>
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/analytics.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+<body>
+
+  <div class="dash-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="20" fill="rgba(232,56,95,0.12)"/>
+          <path d="M9 24c3-9 8-13 11-13s8 4 11 13" stroke="#e8385f" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+          <circle cx="9" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="31" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="20" cy="11" r="2.6" fill="#101b30"/>
+        </svg>
+        <span class="brand-name">TransitOps</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="nav-item">
+          <i class="fa-solid fa-gauge"></i> Dashboard
+        </a>
+        <a href="/fleet" class="nav-item">
+          <i class="fa-solid fa-truck"></i> Fleet
+        </a>
+        <a href="/drivers" class="nav-item">
+          <i class="fa-solid fa-id-card"></i> Drivers
+        </a>
+        <a href="/trips" class="nav-item">
+          <i class="fa-solid fa-route"></i> Trips
+        </a>
+        <a href="/maintenance" class="nav-item">
+          <i class="fa-solid fa-screwdriver-wrench"></i> Maintenance
+        </a>
+        <a href="/fuel-expenses" class="nav-item">
+          <i class="fa-solid fa-gas-pump"></i> Fuel &amp; Expenses
+        </a>
+        <a href="/analytics" class="nav-item active">
+          <i class="fa-solid fa-chart-line"></i> Analytics
+        </a>
+        <a href="/settings" class="nav-item">
+          <i class="fa-solid fa-gear"></i> Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="nav-item logout-btn" id="logoutBtn">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="dash-main">
+
+      <header class="topbar">
+        <div class="topbar-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search vehicles, drivers, trips…" id="globalSearch" />
+        </div>
+
+        <div class="topbar-right">
+          <button class="icon-btn" title="Notifications">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+          <div class="user-block">
+            <span class="user-name" id="userName">—</span>
+            <span class="status-pill" id="connectionStatus">
+              <span class="status-dot"></span> Connecting…
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="dash-content">
+
+        <div class="content-header content-header-row">
+          <div>
+            <h1>Reports &amp; Analytics</h1>
+            <p class="content-sub">
+              Viewing as <strong data-user-role>role</strong> — panels below adapt to your role.
+            </p>
+          </div>
+          <button class="btn-primary" id="exportCsvBtn">
+            <i class="fa-solid fa-file-csv"></i> Export CSV
+          </button>
+        </div>
+
+        <!-- KPI summary — visible to every role (PDF §3.8) -->
+        <div class="stat-cards" id="analyticsKpis"></div>
+
+        <!-- Fleet utilization trend — everyone, primarily Fleet Manager -->
+        <section class="panel panel-chart">
+          <div class="panel-header panel-header-row">
+            <h2>Fleet Utilization (last 6 months)</h2>
+            <span class="panel-tag">%</span>
+          </div>
+          <div class="chart-wrap" id="utilizationChart"></div>
+        </section>
+
+        <div class="analytics-grid">
+          <!-- Fuel efficiency by vehicle — Fleet Manager + Financial Analyst -->
+          <section class="panel panel-chart" data-roles="fleet_manager,financial_analyst,driver">
+            <div class="panel-header panel-header-row">
+              <h2>Fuel Efficiency by Vehicle</h2>
+              <span class="panel-tag">km / L</span>
+            </div>
+            <div class="chart-wrap" id="fuelEfficiencyChart"></div>
+          </section>
+
+          <!-- Operational cost split — Financial Analyst -->
+          <section class="panel panel-chart" data-roles="financial_analyst,fleet_manager">
+            <div class="panel-header panel-header-row">
+              <h2>Operational Cost Breakdown</h2>
+              <span class="panel-tag">Fuel + Maintenance</span>
+            </div>
+            <div class="chart-wrap donut-wrap" id="costDonut"></div>
+          </section>
+        </div>
+
+        <!-- Vehicle ROI table — Financial Analyst + Fleet Manager -->
+        <section class="panel" data-roles="financial_analyst,fleet_manager">
+          <div class="panel-header panel-header-row">
+            <h2>Vehicle ROI</h2>
+            <span class="panel-tag">(Revenue − (Maint. + Fuel)) / Acq. Cost</span>
+          </div>
+          <table class="trips-table roi-table">
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th>Revenue</th>
+                <th>Fuel</th>
+                <th>Maintenance</th>
+                <th>Acq. Cost</th>
+                <th>ROI</th>
+              </tr>
+            </thead>
+            <tbody id="roiBody"></tbody>
+          </table>
+        </section>
+
+        <!-- Driver safety & compliance — Safety Officer -->
+        <section class="panel" data-roles="safety_officer">
+          <div class="panel-header panel-header-row">
+            <h2>Driver Safety &amp; Compliance</h2>
+            <span class="panel-tag">Safety scores &amp; license validity</span>
+          </div>
+          <table class="trips-table">
+            <thead>
+              <tr>
+                <th>Driver</th>
+                <th>Safety Score</th>
+                <th>License Expiry</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="safetyBody"></tbody>
+          </table>
+        </section>
+
+        <!-- Active deliveries — Driver -->
+        <section class="panel" data-roles="driver,fleet_manager">
+          <div class="panel-header panel-header-row">
+            <h2>Active Deliveries</h2>
+            <span class="panel-tag">In-progress trips</span>
+          </div>
+          <table class="trips-table">
+            <thead>
+              <tr>
+                <th>Trip</th>
+                <th>Route</th>
+                <th>Vehicle</th>
+                <th>Progress</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="deliveriesBody"></tbody>
+          </table>
+        </section>
+
+        <p class="table-note">
+          Data shown is sample/hardcoded for demonstration. CSV export includes the Vehicle ROI dataset.
+        </p>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/auth-guard.js"></script>
+  <script src="/js/analytics.js"></script>
+</body>
+</html>

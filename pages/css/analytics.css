@@ -1,0 +1,211 @@
+/* ============================================
+   TransitOps — Analytics page styles
+   Builds on dashboard.css shared shell/classes.
+   ============================================ */
+
+/* Shared buttons + header row (also defined in fleet.css;
+   re-declared here so analytics doesn't depend on it). */
+.content-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+.content-header-row h1 {
+  margin: 0 0 4px;
+}
+
+.content-sub {
+  margin: 0;
+  font-size: 13px;
+  color: #8a8f9c;
+}
+.content-sub strong {
+  color: #e8385f;
+  text-transform: capitalize;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: #e8385f;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  background: #d12c50;
+}
+
+/* ---------- Panels / charts ---------- */
+.panel-chart {
+  margin-bottom: 18px;
+}
+
+.panel-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 6px;
+}
+
+.panel-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9a9fae;
+  background: #f4f5f9;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.chart-wrap {
+  padding: 8px 20px 20px;
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chart-svg .grid {
+  stroke: #eceef3;
+  stroke-width: 1;
+}
+.chart-svg .axis-label {
+  fill: #9a9fae;
+  font-size: 11px;
+  font-family: inherit;
+}
+.chart-svg .bar {
+  fill: #e8385f;
+  transition: fill 0.15s ease;
+}
+.chart-svg .bar:hover {
+  fill: #d12c50;
+}
+.chart-svg .bar-value {
+  fill: #4a4f5c;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+/* ---------- Two-column grid ---------- */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+/* ---------- Donut ---------- */
+.donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.donut-svg {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+}
+.donut-total {
+  fill: #101b30;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: inherit;
+}
+.donut-caption {
+  fill: #9a9fae;
+  font-size: 10px;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.legend-label {
+  color: #4a4f5c;
+  font-weight: 600;
+  min-width: 92px;
+}
+.legend-value {
+  color: #101b30;
+  font-weight: 700;
+}
+
+/* ---------- ROI / tables ---------- */
+.roi-pos { color: #1e9e51; font-weight: 700; }
+.roi-neg { color: #d43a52; font-weight: 700; }
+
+.mini-track {
+  display: inline-block;
+  width: 80px;
+  height: 6px;
+  border-radius: 5px;
+  background: #f0f1f4;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.mini-fill {
+  height: 100%;
+  background: #3ab0ff;
+  border-radius: 5px;
+}
+.mini-pct {
+  font-size: 11px;
+  color: #9a9fae;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+.trip-status.off-duty { background: #f0f1f4; color: #8a8f9c; }
+.trip-status.available { background: #e9f9ee; color: #1e9e51; }
+.trip-status.suspended { background: #fdecee; color: #d43a52; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 980px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   Dark mode (html[data-theme="dark"])
+   ============================================ */
+:root[data-theme="dark"] .panel-tag {
+  background: #1e2a44;
+  color: #a8b1c4;
+}
+:root[data-theme="dark"] .chart-svg .grid { stroke: #1e2a44; }
+:root[data-theme="dark"] .chart-svg .bar-value { fill: #cfd6e4; }
+:root[data-theme="dark"] .donut-total { fill: #f4f6fb; }
+:root[data-theme="dark"] .legend-label { color: #cfd6e4; }
+:root[data-theme="dark"] .legend-value { color: #f4f6fb; }
+:root[data-theme="dark"] .content-sub { color: #8a93a8; }
+:root[data-theme="dark"] .mini-track { background: #1e2a44; }

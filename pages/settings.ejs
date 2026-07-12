@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings · TransitOps</title>
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/settings.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+<body>
+
+  <div class="dash-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="20" fill="rgba(232,56,95,0.12)"/>
+          <path d="M9 24c3-9 8-13 11-13s8 4 11 13" stroke="#e8385f" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+          <circle cx="9" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="31" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="20" cy="11" r="2.6" fill="#101b30"/>
+        </svg>
+        <span class="brand-name">TransitOps</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="nav-item">
+          <i class="fa-solid fa-gauge"></i> Dashboard
+        </a>
+        <a href="/fleet" class="nav-item">
+          <i class="fa-solid fa-truck"></i> Fleet
+        </a>
+        <a href="/drivers" class="nav-item">
+          <i class="fa-solid fa-id-card"></i> Drivers
+        </a>
+        <a href="/trips" class="nav-item">
+          <i class="fa-solid fa-route"></i> Trips
+        </a>
+        <a href="/maintenance" class="nav-item">
+          <i class="fa-solid fa-screwdriver-wrench"></i> Maintenance
+        </a>
+        <a href="/fuel-expenses" class="nav-item">
+          <i class="fa-solid fa-gas-pump"></i> Fuel &amp; Expenses
+        </a>
+        <a href="/analytics" class="nav-item">
+          <i class="fa-solid fa-chart-line"></i> Analytics
+        </a>
+        <a href="/settings" class="nav-item active">
+          <i class="fa-solid fa-gear"></i> Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="nav-item logout-btn" id="logoutBtn">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="dash-main">
+
+      <header class="topbar">
+        <div class="topbar-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search settings…" id="globalSearch" />
+        </div>
+
+        <div class="topbar-right">
+          <button class="icon-btn" title="Notifications">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+          <div class="user-block">
+            <span class="user-name" id="userName">—</span>
+            <span class="status-pill" id="connectionStatus">
+              <span class="status-dot"></span> Connecting…
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="dash-content">
+        <div class="content-header">
+          <h1>Settings</h1>
+        </div>
+
+        <div class="settings-layout">
+
+          <!-- Section nav -->
+          <nav class="settings-nav">
+            <a href="#profile" class="settings-nav-item active">Profile</a>
+            <a href="#security" class="settings-nav-item">Account &amp; Security</a>
+            <a href="#preferences" class="settings-nav-item">Preferences</a>
+            <a href="#notifications" class="settings-nav-item">Notifications</a>
+            <a href="#access" class="settings-nav-item">Role &amp; Permissions</a>
+          </nav>
+
+          <div class="settings-content">
+
+            <!-- Profile -->
+            <section class="panel settings-card" id="profile">
+              <div class="panel-header"><h2>Profile</h2></div>
+              <div class="settings-body">
+                <div class="profile-head">
+                  <div class="avatar" data-user-initials>--</div>
+                  <div>
+                    <div class="profile-name" data-user-name>user</div>
+                    <div class="profile-email" data-user-email>user@example.com</div>
+                    <span class="role-badge"><i class="fa-solid fa-shield-halved"></i> <span data-user-role>role</span></span>
+                  </div>
+                </div>
+                <p class="hint">Your role is assigned at registration and controls what you can access across TransitOps.</p>
+              </div>
+            </section>
+
+            <!-- Account & Security -->
+            <section class="panel settings-card" id="security">
+              <div class="panel-header"><h2>Account &amp; Security</h2></div>
+              <form class="settings-body" id="accountForm">
+                <div class="form-field">
+                  <label for="accEmail">Email address</label>
+                  <input type="email" id="accEmail" placeholder="you@example.com" />
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-field">
+                    <label for="newPassword">New password</label>
+                    <input type="password" id="newPassword" placeholder="Leave blank to keep current" minlength="6" />
+                  </div>
+                  <div class="form-field">
+                    <label for="confirmPassword">Confirm new password</label>
+                    <input type="password" id="confirmPassword" placeholder="Re-enter new password" minlength="6" />
+                  </div>
+                </div>
+
+                <p class="form-msg" id="accountMsg"></p>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary" id="saveAccountBtn">
+                    <i class="fa-solid fa-floppy-disk"></i> Save changes
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Preferences -->
+            <section class="panel settings-card" id="preferences">
+              <div class="panel-header"><h2>Preferences</h2></div>
+              <div class="settings-body">
+                <div class="toggle-row">
+                  <div>
+                    <div class="toggle-title">Dark mode</div>
+                    <div class="toggle-sub">Use a dark theme across the app.</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="prefDarkMode" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div>
+                    <div class="toggle-title">Compact tables</div>
+                    <div class="toggle-sub">Denser rows in registries and reports.</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="prefCompact" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="form-field">
+                  <label for="prefLanding">Default landing page</label>
+                  <select id="prefLanding">
+                    <option value="/dashboard">Dashboard</option>
+                    <option value="/fleet">Fleet</option>
+                    <option value="/trips">Trips</option>
+                    <option value="/analytics">Analytics</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <!-- Notifications -->
+            <section class="panel settings-card" id="notifications">
+              <div class="panel-header"><h2>Notifications</h2></div>
+              <div class="settings-body">
+                <div class="toggle-row">
+                  <div>
+                    <div class="toggle-title">License expiry reminders</div>
+                    <div class="toggle-sub">Email alerts before a driver's license expires.</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="notifLicense" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div>
+                    <div class="toggle-title">Maintenance due alerts</div>
+                    <div class="toggle-sub">Notify when a vehicle is due for service.</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="notifMaintenance" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div>
+                    <div class="toggle-title">Weekly operations report</div>
+                    <div class="toggle-sub">A summary of fleet activity every Monday.</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="notifWeekly" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <!-- Role & Permissions -->
+            <section class="panel settings-card" id="access">
+              <div class="panel-header"><h2>Role &amp; Permissions</h2></div>
+              <div class="settings-body">
+                <p class="hint">
+                  You are signed in as <strong data-user-role>role</strong>. TransitOps enforces
+                  Role-Based Access Control — the areas below reflect what your role can do.
+                </p>
+                <ul class="perm-list" id="permList"></ul>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/js/auth-guard.js"></script>
+  <script src="/js/settings.js"></script>
+</body>
+</html>

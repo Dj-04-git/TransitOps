@@ -1,0 +1,295 @@
+/* ============================================
+   TransitOps — Settings page styles
+   Builds on dashboard.css shared shell/classes.
+   ============================================ */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: #e8385f;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn-primary:hover { background: #d12c50; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ---------- Layout: side nav + content ---------- */
+.settings-layout {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.settings-nav {
+  position: sticky;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-nav-item {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #6a6f7d;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.settings-nav-item:hover {
+  background: #f4f5f9;
+  color: #101b30;
+}
+.settings-nav-item.active {
+  background: rgba(232, 56, 95, 0.1);
+  color: #e8385f;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.settings-card {
+  scroll-margin-top: 20px;
+}
+
+.settings-body {
+  padding: 16px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #8a8f9c;
+}
+.hint strong { color: #e8385f; text-transform: capitalize; }
+
+/* ---------- Profile ---------- */
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: #e8385f;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.profile-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #101b30;
+  text-transform: capitalize;
+}
+.profile-email {
+  font-size: 13px;
+  color: #8a8f9c;
+  margin: 2px 0 8px;
+}
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(232, 56, 95, 0.1);
+  color: #b51f42;
+  text-transform: capitalize;
+}
+
+/* ---------- Forms ---------- */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-field label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a4f5c;
+}
+.form-field input,
+.form-field select {
+  border: 1px solid #e3e5ec;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #101b30;
+  font-family: inherit;
+}
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #e8385f;
+  box-shadow: 0 0 0 3px rgba(232, 56, 95, 0.12);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.form-msg {
+  margin: 0;
+  font-size: 13px;
+  min-height: 1px;
+}
+.form-msg.error { color: #d43a52; }
+.form-msg.success { color: #1e9e51; }
+
+/* ---------- Toggle rows + switch ---------- */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f4f5f9;
+}
+.toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.toggle-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #101b30;
+}
+.toggle-sub {
+  font-size: 12.5px;
+  color: #8a8f9c;
+  margin-top: 2px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: #cfd3dc;
+  border-radius: 24px;
+  transition: background 0.2s ease;
+}
+.slider::before {
+  content: '';
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+.switch input:checked + .slider { background: #e8385f; }
+.switch input:checked + .slider::before { transform: translateX(18px); }
+
+/* ---------- Permissions list ---------- */
+.perm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.perm-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: #4a4f5c;
+}
+.perm-list li i { color: #1e9e51; }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  background: #101b30;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(16, 27, 48, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 100;
+}
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.toast.error { background: #d43a52; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 820px) {
+  .settings-layout { grid-template-columns: 1fr; }
+  .settings-nav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================
+   Dark mode (html[data-theme="dark"])
+   ============================================ */
+:root[data-theme="dark"] .settings-nav-item { color: #a8b1c4; }
+:root[data-theme="dark"] .settings-nav-item:hover { background: #1e2a44; color: #f4f6fb; }
+:root[data-theme="dark"] .settings-nav-item.active { background: rgba(232,56,95,0.18); color: #ff6f8d; }
+:root[data-theme="dark"] .profile-name { color: #f4f6fb; }
+:root[data-theme="dark"] .toggle-title { color: #f4f6fb; }
+:root[data-theme="dark"] .toggle-row { border-bottom-color: #1e2a44; }
+:root[data-theme="dark"] .form-field label { color: #cfd6e4; }
+:root[data-theme="dark"] .form-field input,
+:root[data-theme="dark"] .form-field select {
+  background: #17223a;
+  border-color: #1e2a44;
+  color: #f4f6fb;
+}
+:root[data-theme="dark"] .perm-list li { color: #cfd6e4; }
+:root[data-theme="dark"] .slider { background: #3a465f; }

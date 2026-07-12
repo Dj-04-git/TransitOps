@@ -53,6 +53,12 @@
           <i class="fa-solid fa-gear"></i> Settings
         </a>
       </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="nav-item logout-btn" id="logoutBtn">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
     </aside>
 
     <!-- Main -->
@@ -149,6 +155,12 @@
     document.getElementById('usernameValue').textContent = username;
     document.getElementById('roleValue').textContent = role.replace(/_/g, ' ');
     document.getElementById('emailValue').textContent = `Signed in as ${email}`;
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('transitops_token');
+      localStorage.removeItem('transitops_user');
+      window.location.href = '/login';
+    });
   </script>
 </body>
 </html>

@@ -157,7 +157,11 @@
 
         await validateToken(data.token);
 
-        const destination = '/dashboard';
+        // Honor ?next= from the auth guard, but only allow local paths.
+        const nextParam = new URLSearchParams(window.location.search).get('next');
+        const destination = nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//')
+          ? nextParam
+          : '/dashboard';
 
         showAlert('Login successful. Redirecting now...', 'success');
         window.setTimeout(() => {

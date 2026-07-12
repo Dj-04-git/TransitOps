@@ -109,6 +109,12 @@ app.get("/maintenance", (req, res) => {
 app.get("/fuel-expenses", (req, res) => {
   res.render("fuel-expenses");
 });
+app.get("/analytics", (req, res) => {
+  res.render("analytics");
+});
+app.get("/settings", (req, res) => {
+  res.render("settings");
+});
 
 
 
