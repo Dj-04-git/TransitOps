@@ -3,9 +3,9 @@ import { protect, authorizeRoles } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/me", protect, authorizeRoles("financial_analyst"), (req, res) => {
+router.get("/me", protect, authorizeRoles("safety_officer"), (req, res) => {
   res.json({
-    message: "Financial analyst portal ready",
+    message: "Safety officer portal ready",
     user: req.user
   });
 });

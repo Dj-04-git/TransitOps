@@ -3,6 +3,13 @@ import * as dispatcherController from "../controllers/dispatcherController.js";
 
 const router = express.Router();
 
+router.get("/health", (req, res) => {
+  res.json({ message: "Dispatcher routes are available" });
+});
+
+
+
+
 router.get("/", dispatcherController.getAllDrivers);
 router.get("/:id", dispatcherController.getDriverById);
 router.post("/", dispatcherController.createDriver);

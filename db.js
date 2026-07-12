@@ -4,16 +4,16 @@ import { config } from "./config.js";
 const { Pool } = pg;
 
 if (!config.DATABASE_URL) {
-    throw new Error("DATABASE_URL is required to connect to PostgreSQL");
+  throw new Error("DATABASE_URL is required to connect to PostgreSQL");
 }
 
 const pool = new Pool({
-    connectionString: config.DATABASE_URL,
-    max: 10
+  connectionString: config.DATABASE_URL,
+  max: 10
 });
 
 const ensureUserSchema = async () => {
-    await pool.query(`
+  await pool.query(`
     DO $$
     BEGIN
       IF NOT EXISTS (
@@ -44,12 +44,12 @@ const ensureUserSchema = async () => {
 };
 
 export const initDatabase = async () => {
-    await pool.query("SELECT 1");
-    await ensureUserSchema();
+  await pool.query("SELECT 1");
+  await ensureUserSchema();
 };
 
 pool.on("error", (error) => {
-    console.error("Unexpected PostgreSQL pool error:", error);
+  console.error("Unexpected PostgreSQL pool error:", error);
 });
 
 export default pool;
