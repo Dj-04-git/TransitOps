@@ -1,5 +1,11 @@
 import express from "express";
-import * as dispatcherController from "../controllers/dispatcherController.js";
+
+import dashboardController from "../controllers/dashboardController.js";
+import dispatcherController from "../controllers/dispatcherController.js";
+import vehicleController from "../controllers/vehicleController.js";
+import tripController from "../controllers/tripController.js";
+import fuelController from "../controllers/fuelController.js";
+import expenseController from "../controllers/expenseController.js";
 
 const router = express.Router();
 
