@@ -16,78 +16,11 @@ router.get("/health", (req, res) => {
 
 
 
-/* ============================================================
-   DASHBOARD
-============================================================ */
-
-router.get("/dashboard", dashboardController.renderDashboard);
-
-
-/* ============================================================
-   DISPATCHER PROFILE
-============================================================ */
-
-router.get("/profile", dispatcherController.getProfile);
-router.put("/profile", dispatcherController.updateProfile);
-
-
-/* ============================================================
-   VEHICLES (Read Only)
-============================================================ */
-
-router.get("/vehicles", vehicleController.getAllVehicles);
-
-router.get("/vehicles/:id", vehicleController.getVehicleById);
-
-
-/* ============================================================
-   TRIPS
-============================================================ */
-
-router.get("/trips", tripController.getAllTrips);
-
-router.get("/trips/create", tripController.renderCreateTripPage);
-
-router.get("/trips/:id", tripController.getTripById);
-
-router.get("/trips/:id/edit", tripController.renderEditTripPage);
-
-router.post("/trips", tripController.createTrip);
-
-router.put("/trips/:id", tripController.updateTrip);
-
-router.patch("/trips/:id/dispatch", tripController.dispatchTrip);
-
-router.patch("/trips/:id/complete", tripController.completeTrip);
-
-router.patch("/trips/:id/cancel", tripController.cancelTrip);
-
-router.delete("/trips/:id", tripController.deleteTrip);
-
-
-/* ============================================================
-   FUEL LOGS
-============================================================ */
-
-router.get("/fuel", fuelController.getAllFuelLogs);
-
-router.get("/fuel/create", fuelController.renderCreateFuelPage);
-
-router.get("/fuel/:id", fuelController.getFuelLogById);
-
-router.post("/fuel", fuelController.createFuelLog);
-
-
-/* ============================================================
-   EXPENSES
-============================================================ */
-
-router.get("/expenses", expenseController.getAllExpenses);
-
-router.get("/expenses/create", expenseController.renderCreateExpensePage);
-
-router.get("/expenses/:id", expenseController.getExpenseById);
-
-router.post("/expenses", expenseController.createExpense);
+router.get("/", dispatcherController.getAllDrivers);
+router.get("/:id", dispatcherController.getDriverById);
+router.post("/", dispatcherController.createDriver);
+router.put("/:id", dispatcherController.updateDriver);
+router.delete("/:id", dispatcherController.deleteDriver);
+router.patch("/:id/status", dispatcherController.updateDriverStatus);
 
 export default router;
