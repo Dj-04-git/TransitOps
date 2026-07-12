@@ -1,0 +1,154 @@
+<%- include('partials/head', { title: 'TransitOps | Smart Transport Operations Platform' }) %>
+
+<body class="min-h-screen bg-base-200 text-base-content">
+  <%- include('partials/navbar', { active: 'home' }) %>
+
+  <main>
+    <section class="relative overflow-hidden">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(37,99,235,0.16),_transparent_34%),radial-gradient(circle_at_top_right,_rgba(245,158,11,0.14),_transparent_28%),linear-gradient(180deg,_rgba(255,255,255,0.4),_transparent_55%)]"></div>
+      <div class="container relative mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:py-24">
+        <div class="space-y-8">
+          <div class="inline-flex items-center gap-2 rounded-full border border-base-300 bg-base-100/80 px-4 py-2 text-sm text-base-content/70 shadow-sm backdrop-blur">
+            <span class="badge badge-primary badge-sm"></span>
+            Smart transport operations for fleet teams
+          </div>
+
+          <div class="space-y-5">
+            <h1 class="max-w-3xl text-5xl font-black tracking-tight text-balance sm:text-6xl lg:text-7xl">
+              Run your fleet, dispatches, maintenance, and costs from one control center.
+            </h1>
+            <p class="max-w-2xl text-lg leading-8 text-base-content/70 sm:text-xl">
+              TransitOps replaces spreadsheets and manual logbooks with a single platform for vehicle registry,
+              driver compliance, trip lifecycle management, maintenance workflow, fuel logging, expense tracking,
+              and analytics.
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <a class="btn btn-primary btn-lg" href="#overview">Explore the platform</a>
+            <a class="btn btn-ghost btn-lg" href="#workflows">See core workflows</a>
+          </div>
+
+          <div class="grid gap-3 sm:grid-cols-3">
+            <%- include('partials/stat-card', { label: 'Fleet utilization', value: 'Live KPIs', detail: 'Track active, available, and in-shop assets at a glance.' }) %>
+            <%- include('partials/stat-card', { label: 'Compliance', value: 'RBAC', detail: 'Protect operations with role-based access and status rules.' }) %>
+            <%- include('partials/stat-card', { label: 'Cost control', value: 'Fuel + Maintenance', detail: 'Understand total operational cost per vehicle.' }) %>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="absolute -left-8 top-10 h-32 w-32 rounded-full bg-primary/15 blur-3xl"></div>
+          <div class="absolute -right-6 bottom-8 h-36 w-36 rounded-full bg-accent/15 blur-3xl"></div>
+
+          <div class="card border border-base-300 bg-base-100/90 shadow-2xl backdrop-blur">
+            <div class="card-body gap-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm uppercase tracking-[0.25em] text-base-content/50">Operations dashboard</p>
+                  <h2 class="mt-1 text-2xl font-bold">Today at a glance</h2>
+                </div>
+                <div class="badge badge-success badge-lg">Active</div>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="rounded-2xl bg-base-200 p-4">
+                  <p class="text-sm text-base-content/60">Active vehicles</p>
+                  <p class="mt-2 text-3xl font-black">128</p>
+                </div>
+                <div class="rounded-2xl bg-base-200 p-4">
+                  <p class="text-sm text-base-content/60">Trips in motion</p>
+                  <p class="mt-2 text-3xl font-black">34</p>
+                </div>
+                <div class="rounded-2xl bg-base-200 p-4">
+                  <p class="text-sm text-base-content/60">Vehicles in shop</p>
+                  <p class="mt-2 text-3xl font-black">9</p>
+                </div>
+                <div class="rounded-2xl bg-base-200 p-4">
+                  <p class="text-sm text-base-content/60">Fleet utilization</p>
+                  <p class="mt-2 text-3xl font-black">87%</p>
+                </div>
+              </div>
+
+              <div class="rounded-2xl bg-neutral text-neutral-content p-5">
+                <p class="text-sm uppercase tracking-[0.2em] text-neutral-content/70">Business rule engine</p>
+                <p class="mt-3 text-lg leading-7 text-neutral-content/90">
+                  Retired and in-shop vehicles stay out of dispatch. Expired or suspended drivers never reach trip assignment.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="overview" class="container mx-auto max-w-7xl px-6 py-8 lg:py-16">
+      <%- include('partials/section-heading', {
+        eyebrow: 'Why TransitOps',
+        title: 'Built around the real work of fleet teams',
+        description: 'From the business brief, the application needs to handle the full transport lifecycle without losing control of compliance or cost.'
+      }) %>
+
+      <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <%- include('partials/feature-card', {
+          title: 'Vehicle registry',
+          description: 'Keep a master list of assets with registration number, model, capacity, odometer, cost, and status.',
+          badge: 'Available / On Trip / In Shop / Retired'
+        }) %>
+        <%- include('partials/feature-card', {
+          title: 'Driver management',
+          description: 'Track license number, category, expiry, contact details, safety score, and duty status.',
+          badge: 'Compliance first'
+        }) %>
+        <%- include('partials/feature-card', {
+          title: 'Trip dispatch',
+          description: 'Create trips with source, destination, cargo weight, planned distance, and automatic status changes.',
+          badge: 'Draft → Dispatched → Completed'
+        }) %>
+        <%- include('partials/feature-card', {
+          title: 'Analytics and cost',
+          description: 'Measure utilization, fuel efficiency, operating cost, and ROI with export-ready reporting.',
+          badge: 'CSV export ready'
+        }) %>
+      </div>
+    </section>
+
+    <section id="workflows" class="container mx-auto max-w-7xl px-6 py-8 lg:py-16">
+      <%- include('partials/section-heading', {
+        eyebrow: 'Core workflows',
+        title: 'The platform flows around dispatch, maintenance, and finance',
+        description: 'These are the operational loops the app needs to make frictionless for managers and analysts.'
+      }) %>
+
+      <div class="mt-10 grid gap-6 lg:grid-cols-3">
+        <div class="card bg-base-100 shadow-lg">
+          <div class="card-body">
+            <h3 class="card-title">Operational control</h3>
+            <p class="text-base-content/70">Dashboard KPIs, filters by vehicle type, status, and region, plus role-based views for each team.</p>
+          </div>
+        </div>
+        <div class="card bg-base-100 shadow-lg">
+          <div class="card-body">
+            <h3 class="card-title">Automatic status rules</h3>
+            <p class="text-base-content/70">Dispatching, completing, cancelling, and maintenance actions all update vehicle and driver status automatically.</p>
+          </div>
+        </div>
+        <div class="card bg-base-100 shadow-lg">
+          <div class="card-body">
+            <h3 class="card-title">Records and exports</h3>
+            <p class="text-base-content/70">Fuel logs, expenses, maintenance entries, and reports keep finance and operations aligned.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container mx-auto max-w-7xl px-6 py-8 pb-20 lg:py-16 lg:pb-24">
+      <%- include('partials/cta-panel', {
+        title: 'Ready to operationalize your fleet?',
+        description: 'TransitOps is designed to turn the full transport lifecycle into a clear, controlled, and measurable workflow.'
+      }) %>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

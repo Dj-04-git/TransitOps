@@ -141,3 +141,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+TransitOps Smart Transport Operations Platform.pdf
+package-lock.json
