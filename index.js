@@ -63,11 +63,11 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    res.render("login");
+    res.render("new-login");
 });
 
 app.get("/register", (req, res) => {
-    res.render("register");
+    res.render("new-register");
 });
 
 app.get("/registry", (req, res) => {

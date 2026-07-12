@@ -14,7 +14,6 @@
 
   <div class="auth-card">
 
-    <!-- Left: hero image panel -->
     <div class="auth-hero">
 
       <div class="brand">
@@ -32,75 +31,119 @@
       <p class="tagline">Fleet tracking, route optimization, and live dispatch — all in one operations platform.</p>
     </div>
 
-    <!-- Right: register form panel -->
     <div class="auth-form-panel">
-      <h2>Register</h2>
+      <h2>Create account</h2>
       <p class="auth-subtext">
         Already have an account?
         <a href="/login">Sign in here</a>, it takes less than a minute.
       </p>
 
-      <% if (typeof error !== 'undefined' && error) { %>
-        <div class="form-error"><%= error %></div>
-      <% } %>
-
-      <form action="/register" method="POST" novalidate>
+      <form id="registerForm" action="/api/auth/register" method="post" novalidate>
 
         <div class="field">
-          <label for="name">Name</label>
+          <label for="email">Email address</label>
           <div class="input-row">
-            <input type="text" id="name" name="name" placeholder="Your full name"
-                   value="<%= typeof formData !== 'undefined' ? formData.name : '' %>" required />
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="email">Email ID</label>
-          <div class="input-row">
-            <input type="email" id="email" name="email" placeholder="you@example.com"
-                   value="<%= typeof formData !== 'undefined' ? formData.email : '' %>" required />
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="phone">Phone No</label>
-          <div class="input-row">
-            <span class="prefix">+62</span>
-            <input type="tel" id="phone" name="phone" placeholder="812 3456 7890"
-                   value="<%= typeof formData !== 'undefined' ? formData.phone : '' %>" />
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="operator@company.com"
+              autocomplete="email"
+              required
+            />
           </div>
         </div>
 
         <div class="field">
           <label for="password">Password</label>
           <div class="input-row">
-            <input type="password" id="password" name="password" placeholder="••••••••" required />
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Minimum 6 characters"
+              minlength="6"
+              autocomplete="new-password"
+              required
+            />
           </div>
         </div>
 
-        <div class="checkbox-row">
-          <input type="checkbox" id="terms" name="terms" required />
-          <label for="terms">I accept the <a href="/terms">terms and conditions</a> &amp; privacy policy</label>
+        <div class="field">
+          <label for="role">Operational role</label>
+          <div class="input-row">
+            <select id="role" name="role" required>
+              <option value="" selected disabled>Select account role</option>
+              <option value="fleet_manager">Fleet manager</option>
+              <option value="driver">Driver</option>
+              <option value="safety_officer">Safety officer</option>
+              <option value="financial_analyst">Financial analyst</option>
+            </select>
+          </div>
+          <p class="fieldset-label">Role determines accessible operational functions.</p>
         </div>
 
-        <button type="submit" class="btn-submit">Register</button>
-      </form>
+        <div id="registerAlert" class="form-error hidden" role="alert"></div>
 
-      <p class="social-label">Sign up with social media</p>
-      <div class="social-row">
-        <a href="/auth/facebook" class="social-btn facebook">
-          <i class="fa-brands fa-facebook-f"></i> Facebook
-        </a>
-        <a href="/auth/twitter" class="social-btn twitter">
-          <i class="fa-brands fa-twitter"></i> Twitter
-        </a>
-        <a href="/auth/google" class="social-btn google">
-          <i class="fa-brands fa-google"></i> Google+
-        </a>
-      </div>
+        <button id="registerButton" type="submit" class="btn-submit">
+          Create account
+        </button>
+      </form>
     </div>
 
   </div>
+
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const registerAlert = document.getElementById('registerAlert');
+    const registerButton = document.getElementById('registerButton');
+
+    const showAlert = (message, type) => {
+      registerAlert.className = `form-error ${type === 'error' ? 'error' : 'success'}`;
+      registerAlert.textContent = message;
+      registerAlert.classList.remove('hidden');
+    };
+
+    registerForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      registerAlert.classList.add('hidden');
+      registerButton.disabled = true;
+      registerButton.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Creating account';
+
+      try {
+        const payload = {
+          email: registerForm.email.value.trim(),
+          password: registerForm.password.value,
+          role: registerForm.role.value
+        };
+
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Account registration failed.');
+        }
+
+        showAlert('Account created. Redirecting to login...', 'success');
+
+        setTimeout(() => {
+          window.location.href = '/login?registered=1';
+        }, 700);
+      } catch (error) {
+        showAlert(error.message, 'error');
+        registerButton.disabled = false;
+        registerButton.textContent = 'Create account';
+      }
+    });
+  </script>
 
 </body>
 </html>
