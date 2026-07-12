@@ -235,7 +235,7 @@ const ensureMaintenanceSchema = async () => {
 
 const ensureFuelLogSchema = async () => {
   await pool.query(`
-    CREATE TABLE fuel_logs (
+    CREATE TABLE IF NOT EXISTS fuel_logs (
     id BIGSERIAL PRIMARY KEY,
 
     vehicle_id BIGINT NOT NULL,
