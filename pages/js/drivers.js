@@ -212,11 +212,15 @@ async function handleDriverFormSubmit(e) {
 
   const payload = {
     name: document.getElementById('driverName').value.trim(),
+    licenseNumber: document.getElementById('licenseNo').value.trim(),
     licenseNo: document.getElementById('licenseNo').value.trim(),
     licenseCategory: document.getElementById('licenseCategory').value,
     licenseExpiry: document.getElementById('licenseExpiry').value,
     contact: document.getElementById('contact').value.trim(),
+    contactNumber: document.getElementById('contact').value.trim(),
+    safetyScore: Number(document.getElementById('safetyScore').value),
     safety: Number(document.getElementById('safetyScore').value),
+    tripCompletionPercentage: Number(document.getElementById('tripCompletion').value),
     tripCompletion: Number(document.getElementById('tripCompletion').value),
     status: document.getElementById('driverStatus').value,
   };

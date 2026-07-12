@@ -8,6 +8,27 @@ const normalizeStatus = (status) => {
   return ["available", "on_trip", "off_duty", "suspended"].includes(value) ? value : "available";
 };
 
+const readString = (source, keys) => {
+  for (const key of keys) {
+    if (typeof source[key] === "string") {
+      return source[key].trim();
+    }
+  }
+
+  return "";
+};
+
+const readNumber = (source, keys) => {
+  for (const key of keys) {
+    if (source[key] !== undefined && source[key] !== null && source[key] !== "") {
+      const rawValue = String(source[key]).trim().replace(/[%,$]/g, "");
+      return Number(rawValue);
+    }
+  }
+
+  return Number.NaN;
+};
+
 router.get("/", async (req, res) => {
   try {
     const result = await db.query(
@@ -33,13 +54,13 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
-  const licenseNumber = typeof req.body.licenseNumber === "string" ? req.body.licenseNumber.trim().toUpperCase() : "";
-  const licenseCategory = typeof req.body.licenseCategory === "string" ? req.body.licenseCategory.trim().toUpperCase() : "";
-  const licenseExpiry = typeof req.body.licenseExpiry === "string" ? req.body.licenseExpiry.trim() : "";
-  const contact = typeof req.body.contact === "string" ? req.body.contact.trim() : null;
-  const safety = Number(req.body.safety);
-  const tripCompletion = Number(req.body.tripCompletion);
+  const name = readString(req.body, ["name", "driverName"]);
+  const licenseNumber = readString(req.body, ["licenseNumber", "licenseNo"]);
+  const licenseCategory = readString(req.body, ["licenseCategory", "category"]).toUpperCase();
+  const licenseExpiry = readString(req.body, ["licenseExpiry", "licenseExpiryDate"]);
+  const contact = readString(req.body, ["contact", "contactNumber"]) || null;
+  const safety = readNumber(req.body, ["safetyScore", "safety"]);
+  const tripCompletion = readNumber(req.body, ["tripCompletionPercentage", "tripCompletion"]);
   const status = normalizeStatus(req.body.status);
 
   if (!name || !licenseNumber || !licenseCategory || !licenseExpiry) {
@@ -98,13 +119,13 @@ router.put("/:id", async (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid driver id" });
   }
 
-  const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
-  const licenseNumber = typeof req.body.licenseNumber === "string" ? req.body.licenseNumber.trim().toUpperCase() : "";
-  const licenseCategory = typeof req.body.licenseCategory === "string" ? req.body.licenseCategory.trim().toUpperCase() : "";
-  const licenseExpiry = typeof req.body.licenseExpiry === "string" ? req.body.licenseExpiry.trim() : "";
-  const contact = typeof req.body.contact === "string" ? req.body.contact.trim() : null;
-  const safety = Number(req.body.safety);
-  const tripCompletion = Number(req.body.tripCompletion);
+  const name = readString(req.body, ["name", "driverName"]);
+  const licenseNumber = readString(req.body, ["licenseNumber", "licenseNo"]);
+  const licenseCategory = readString(req.body, ["licenseCategory", "category"]).toUpperCase();
+  const licenseExpiry = readString(req.body, ["licenseExpiry", "licenseExpiryDate"]);
+  const contact = readString(req.body, ["contact", "contactNumber"]) || null;
+  const safety = readNumber(req.body, ["safetyScore", "safety"]);
+  const tripCompletion = readNumber(req.body, ["tripCompletionPercentage", "tripCompletion"]);
   const status = normalizeStatus(req.body.status);
 
   try {
