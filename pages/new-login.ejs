@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login · TransitOps</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+<body>
+
+  <div class="auth-card">
+
+    <!-- Left: hero image panel -->
+    <div class="auth-hero">
+
+      <div class="brand">
+        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.14)"/>
+          <path d="M9 24c3-9 8-13 11-13s8 4 11 13" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+          <circle cx="9" cy="24" r="2.6" fill="#ff4d6d"/>
+          <circle cx="31" cy="24" r="2.6" fill="#ff4d6d"/>
+          <circle cx="20" cy="11" r="2.6" fill="#fff"/>
+        </svg>
+        <span class="brand-name">TransitOps</span>
+      </div>
+
+      <h1>Smart<br />Transport<br />Operations.</h1>
+      <p class="tagline">Fleet tracking, route optimization, and live dispatch — all in one operations platform.</p>
+    </div>
+
+    <!-- Right: login form panel -->
+    <div class="auth-form-panel">
+      <h2>Login</h2>
+      <p class="auth-subtext">
+        Don't have an account?
+        <a href="/register">Create your account</a>, it takes less than a minute.
+      </p>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="form-error"><%= error %></div>
+      <% } %>
+
+      <form action="/login" method="POST" novalidate>
+
+        <div class="field">
+          <label for="email">Email ID</label>
+          <div class="input-row">
+            <input type="email" id="email" name="email" placeholder="you@example.com"
+                   value="<%= typeof formData !== 'undefined' ? formData.email : '' %>" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-row">
+            <input type="password" id="password" name="password" placeholder="••••••••" required />
+          </div>
+        </div>
+
+        <div class="forgot-row">
+          <a href="/forgot-password">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit">Login</button>
+      </form>
+
+      <p class="social-label">Login with social media</p>
+      <div class="social-row">
+        <a href="/auth/facebook" class="social-btn facebook">
+          <i class="fa-brands fa-facebook-f"></i> Facebook
+        </a>
+        <a href="/auth/twitter" class="social-btn twitter">
+          <i class="fa-brands fa-twitter"></i> Twitter
+        </a>
+        <a href="/auth/google" class="social-btn google">
+          <i class="fa-brands fa-google"></i> Google+
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

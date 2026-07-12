@@ -86,9 +86,29 @@ app.get("/reset-password", (req, res) => {
     res.render("reset-password");
 });
 
-app.get("/fleet", (req, res) => {
-    res.render("fleet");
+app.get("/dashboard", (req, res) => {
+  res.render("dashboard");
 });
+
+app.get("/fleet", (req, res) => {
+  res.render("fleet");
+});
+ 
+app.get("/drivers", (req, res) => {
+  res.render("drivers");
+});
+
+app.get("/trips", (req, res) => {
+  res.render("trips");
+});
+app.get("/maintenance", (req, res) => {
+  res.render("maintenance");
+});
+app.get("/fuel-expenses", (req, res) => {
+  res.render("fuel-expenses");
+});
+
+
 
 const startServer = async () => {
   try {

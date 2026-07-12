@@ -1,0 +1,273 @@
+/* ============================================
+   TransitOps — Fleet (Vehicle Registry)
+   Extends dashboard.css. Load dashboard.css
+   first, this file layers on fleet-specific bits.
+   ============================================ */
+
+.content-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.content-header-row h1 {
+  margin: 0;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: #e8385f;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: #d12c50;
+}
+
+.btn-secondary {
+  border: 1px solid #e3e5ec;
+  background: #fff;
+  color: #4a4f5c;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #f4f5f9;
+}
+
+/* ---------- Filters row (fleet adds a reg-no search) ---------- */
+.fleet-filters-row {
+  align-items: flex-end;
+}
+
+.reg-search-wrap {
+  margin-left: auto;
+}
+
+.reg-search-input {
+  border: 1px solid #e3e5ec;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #1a1a1a;
+  min-width: 220px;
+}
+
+.reg-search-input:focus {
+  outline: none;
+  border-color: #3ab0ff;
+}
+
+/* ---------- Vehicles table panel ---------- */
+.panel-fleet {
+  margin-bottom: 12px;
+}
+
+.vehicles-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.vehicles-table thead th {
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #9a9fae;
+  padding: 16px 20px 10px;
+  border-bottom: 1px solid #eceef3;
+}
+
+.vehicles-table tbody td {
+  padding: 13px 20px;
+  border-bottom: 1px solid #f4f5f9;
+  color: #333;
+}
+
+.vehicles-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.vehicles-table .table-loading-row td,
+.vehicles-table .table-empty-row td {
+  text-align: center;
+  color: #9a9fae;
+  padding: 30px 20px;
+  font-size: 13px;
+}
+
+/* ---------- Status pills (registry) ---------- */
+.vehicle-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.vehicle-status.available { background: #e9f9ee; color: #1e9e51; }
+.vehicle-status.on-trip { background: #e6f4ff; color: #1a86e0; }
+.vehicle-status.in-shop { background: #fff4e2; color: #c47a12; }
+.vehicle-status.retired { background: #fdecee; color: #d43a52; }
+
+/* ---------- Row actions ---------- */
+.row-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.row-actions button {
+  border: none;
+  background: transparent;
+  color: #9a9fae;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.row-actions button:hover {
+  background: #f4f5f9;
+  color: #4a4f5c;
+}
+
+.row-actions .delete-btn:hover {
+  color: #d43a52;
+}
+
+/* ---------- Table note ---------- */
+.table-note {
+  font-size: 12px;
+  color: #9a9fae;
+  margin: 4px 4px 0;
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 27, 48, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(16, 27, 48, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid #eceef3;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #101b30;
+}
+
+.modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-row label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #6a6f7d;
+}
+
+.form-row input,
+.form-row select {
+  border: 1px solid #e3e5ec;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: #1a1a1a;
+}
+
+.form-row input:focus,
+.form-row select:focus {
+  outline: none;
+  border-color: #3ab0ff;
+}
+
+.form-row-split {
+  flex-direction: row;
+  gap: 14px;
+}
+
+.form-row-split > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-row-split label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #6a6f7d;
+}
+
+.form-error {
+  color: #d43a52;
+  font-size: 12.5px;
+  margin: 0;
+  min-height: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+@media (max-width: 780px) {
+  .reg-search-wrap {
+    margin-left: 0;
+  }
+}

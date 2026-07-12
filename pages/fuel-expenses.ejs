@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fuel &amp; Expenses · TransitOps</title>
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/maintenance.css" />
+  <link rel="stylesheet" href="/css/fuel-expenses.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+<body>
+
+  <div class="dash-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="20" fill="rgba(232,56,95,0.12)"/>
+          <path d="M9 24c3-9 8-13 11-13s8 4 11 13" stroke="#e8385f" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+          <circle cx="9" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="31" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="20" cy="11" r="2.6" fill="#101b30"/>
+        </svg>
+        <span class="brand-name">TransitOps</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="nav-item">
+          <i class="fa-solid fa-gauge"></i> Dashboard
+        </a>
+        <a href="/fleet" class="nav-item">
+          <i class="fa-solid fa-truck"></i> Fleet
+        </a>
+        <a href="/drivers" class="nav-item">
+          <i class="fa-solid fa-id-card"></i> Drivers
+        </a>
+        <a href="/trips" class="nav-item">
+          <i class="fa-solid fa-route"></i> Trips
+        </a>
+        <a href="/maintenance" class="nav-item">
+          <i class="fa-solid fa-screwdriver-wrench"></i> Maintenance
+        </a>
+        <a href="/fuel-expenses" class="nav-item active">
+          <i class="fa-solid fa-gas-pump"></i> Fuel &amp; Expenses
+        </a>
+        <a href="/analytics" class="nav-item">
+          <i class="fa-solid fa-chart-line"></i> Analytics
+        </a>
+        <a href="/settings" class="nav-item">
+          <i class="fa-solid fa-gear"></i> Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="dash-main">
+
+      <header class="topbar">
+        <div class="topbar-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search fuel logs, expenses…" id="feSearch" />
+        </div>
+
+        <div class="topbar-right">
+          <button class="icon-btn" title="Notifications">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+          <div class="user-block">
+            <span class="user-name" id="userName">—</span>
+            <span class="status-pill" id="connectionStatus">
+              <span class="status-dot"></span> Connecting…
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="dash-content">
+
+        <div class="content-header">
+          <h1>Fuel &amp; Expenses</h1>
+        </div>
+
+        <!-- ===== Fuel Logs ===== -->
+        <section class="panels-row maintenance-row fe-block">
+
+          <div class="panel panel-form">
+            <div class="panel-header">
+              <h2>Log Fuel Entry</h2>
+            </div>
+
+            <form id="fuelForm" class="maintenance-form">
+              <div id="fuelFormError" class="form-error" hidden></div>
+
+              <div class="form-group">
+                <label for="fuelVehicleSelect">Vehicle</label>
+                <select id="fuelVehicleSelect" required>
+                  <option value="">Loading vehicles…</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="fuelQuantity">Liters</label>
+                <input type="number" id="fuelQuantity" min="0" step="0.01" placeholder="e.g. 45" required />
+              </div>
+
+              <div class="form-group">
+                <label for="fuelCost">Fuel Cost</label>
+                <input type="number" id="fuelCost" min="0" step="0.01" placeholder="e.g. 4200" required />
+              </div>
+
+              <div class="form-group">
+                <label for="fuelDate">Date</label>
+                <input type="date" id="fuelDate" required />
+              </div>
+
+              <button type="submit" class="btn-save" id="fuelSaveBtn">Save</button>
+            </form>
+          </div>
+
+          <div class="panel panel-log">
+            <div class="panel-header">
+              <h2>Fuel Log</h2>
+            </div>
+            <table class="trips-table">
+              <thead>
+                <tr>
+                  <th>Vehicle</th>
+                  <th>Date</th>
+                  <th>Liters</th>
+                  <th>Fuel Cost</th>
+                </tr>
+              </thead>
+              <tbody id="fuelLogBody">
+                <tr class="table-loading-row">
+                  <td colspan="4">Loading fuel log…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </section>
+
+        <!-- ===== Other Expenses ===== -->
+        <section class="panels-row maintenance-row fe-block">
+
+          <div class="panel panel-form">
+            <div class="panel-header">
+              <h2>Log Expense</h2>
+            </div>
+
+            <form id="expenseForm" class="maintenance-form">
+              <div id="expenseFormError" class="form-error" hidden></div>
+
+              <div class="form-group">
+                <label for="expenseTripSelect">Trip</label>
+                <select id="expenseTripSelect" required>
+                  <option value="">Loading trips…</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="expenseVehicleSelect">Vehicle</label>
+                <select id="expenseVehicleSelect" required>
+                  <option value="">Loading vehicles…</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="expenseToll">Toll</label>
+                <input type="number" id="expenseToll" min="0" step="0.01" placeholder="e.g. 120" value="0" required />
+              </div>
+
+              <div class="form-group">
+                <label for="expenseMisc">Misc</label>
+                <input type="number" id="expenseMisc" min="0" step="0.01" placeholder="e.g. 0" value="0" required />
+              </div>
+
+              <div class="form-group">
+                <label for="expenseDate">Date</label>
+                <input type="date" id="expenseDate" required />
+              </div>
+
+              <button type="submit" class="btn-save" id="expenseSaveBtn">Save</button>
+            </form>
+          </div>
+
+          <div class="panel panel-log">
+            <div class="panel-header">
+              <h2>Other Expenses (Toll / Misc)</h2>
+            </div>
+            <table class="trips-table">
+              <thead>
+                <tr>
+                  <th>Trip</th>
+                  <th>Vehicle</th>
+                  <th>Toll</th>
+                  <th>Misc</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="expenseLogBody">
+                <tr class="table-loading-row">
+                  <td colspan="6">Loading expenses…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </section>
+
+        <!-- ===== Total operational cost ===== -->
+        <section class="fe-total-row">
+          <span class="fe-total-label">Total Operational Cost (Auto) = Fuel + Maintenance</span>
+          <span class="fe-total-value" id="totalOperationalCost">—</span>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/fuel-expenses.js"></script>
+</body>
+</html>

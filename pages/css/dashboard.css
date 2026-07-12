@@ -1,0 +1,439 @@
+/* ============================================
+   TransitOps — Dashboard
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: #f4f5f9;
+  color: #1a1a1a;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.dash-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: 232px;
+  flex-shrink: 0;
+  background: #101b30;
+  color: #cfd6e4;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 22px 22px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-brand .brand-logo {
+  width: 28px;
+  height: 28px;
+}
+
+.sidebar-brand .brand-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #a8b1c4;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-item i {
+  width: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.nav-item.active {
+  background: rgba(232, 56, 95, 0.16);
+  color: #fff;
+  box-shadow: inset 3px 0 0 #e8385f;
+}
+
+/* ---------- Main column ---------- */
+.dash-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #eceef3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+}
+
+.topbar-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f4f5f9;
+  border-radius: 8px;
+  padding: 9px 14px;
+  width: 320px;
+  color: #9a9fae;
+}
+
+.topbar-search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: #1a1a1a;
+  width: 100%;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: #6a6f7d;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.icon-btn:hover {
+  background: #f4f5f9;
+}
+
+.user-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #f4f5f9;
+  color: #6a6f7d;
+}
+
+.status-pill .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #c9ccd4;
+}
+
+.status-pill.online {
+  background: #e9f9ee;
+  color: #1e9e51;
+}
+.status-pill.online .status-dot {
+  background: #2ecc71;
+}
+
+.status-pill.offline {
+  background: #fdecee;
+  color: #d43a52;
+}
+.status-pill.offline .status-dot {
+  background: #e8385f;
+}
+
+/* ---------- Content ---------- */
+.dash-content {
+  flex: 1;
+  padding: 28px 32px 40px;
+  overflow-y: auto;
+}
+
+.content-header h1 {
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #101b30;
+}
+
+/* ---------- Filters ---------- */
+.filters-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.filter-select {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-select label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #9a9fae;
+}
+
+.filter-select select {
+  border: 1px solid #e3e5ec;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 30px 8px 12px;
+  font-size: 13px;
+  color: #1a1a1a;
+  min-width: 150px;
+  cursor: pointer;
+}
+
+/* ---------- Stat cards ---------- */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 18px;
+  border-left: 4px solid #cfd6e4;
+  box-shadow: 0 1px 3px rgba(16, 27, 48, 0.05);
+}
+
+.stat-card.stat-blue { border-left-color: #3ab0ff; }
+.stat-card.stat-green { border-left-color: #2ecc71; }
+.stat-card.stat-orange { border-left-color: #f5a623; }
+.stat-card.stat-red { border-left-color: #e8385f; }
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #101b30;
+  line-height: 1.2;
+}
+
+.stat-label {
+  margin-top: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #8a8f9c;
+}
+
+.stat-skeleton {
+  height: 74px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #eef0f4 25%, #f7f8fb 37%, #eef0f4 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ---------- Panels ---------- */
+.panels-row {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.panel {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(16, 27, 48, 0.05);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 18px 20px 4px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #101b30;
+}
+
+/* ---------- Trips table ---------- */
+.trips-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.trips-table thead th {
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #9a9fae;
+  padding: 14px 20px 10px;
+  border-bottom: 1px solid #eceef3;
+}
+
+.trips-table tbody td {
+  padding: 13px 20px;
+  border-bottom: 1px solid #f4f5f9;
+  color: #333;
+}
+
+.trips-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-loading-row td,
+.table-empty-row td {
+  text-align: center;
+  color: #9a9fae;
+  padding: 26px 20px;
+  font-size: 13px;
+}
+
+.trip-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.trip-status.on-trip { background: #e6f4ff; color: #1a86e0; }
+.trip-status.completed { background: #e9f9ee; color: #1e9e51; }
+.trip-status.dispatched { background: #eef0ff; color: #5b5fea; }
+.trip-status.draft { background: #f0f1f4; color: #8a8f9c; }
+.trip-status.delayed { background: #fdecee; color: #d43a52; }
+
+/* ---------- Vehicle status bars ---------- */
+.status-bars {
+  padding: 8px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.status-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #4a4f5c;
+}
+
+.status-bar-label .count {
+  color: #9a9fae;
+  font-weight: 500;
+}
+
+.status-bar-track {
+  height: 8px;
+  border-radius: 6px;
+  background: #f0f1f4;
+  overflow: hidden;
+}
+
+.status-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+}
+
+.status-bar-fill.green { background: #2ecc71; }
+.status-bar-fill.blue { background: #3ab0ff; }
+.status-bar-fill.orange { background: #f5a623; }
+.status-bar-fill.red { background: #e8385f; }
+
+.status-loading,
+.status-empty {
+  padding: 30px 0;
+  text-align: center;
+  color: #9a9fae;
+  font-size: 13px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1080px) {
+  .panels-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 780px) {
+  .sidebar {
+    display: none;
+  }
+  .topbar-search {
+    width: 200px;
+  }
+  .dash-content {
+    padding: 20px;
+  }
+}

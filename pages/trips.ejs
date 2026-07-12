@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trips · TransitOps</title>
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/fleet.css" />
+  <link rel="stylesheet" href="/css/trips.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+<body>
+
+  <div class="dash-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <svg class="brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="20" fill="rgba(232,56,95,0.12)"/>
+          <path d="M9 24c3-9 8-13 11-13s8 4 11 13" stroke="#e8385f" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+          <circle cx="9" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="31" cy="24" r="2.6" fill="#e8385f"/>
+          <circle cx="20" cy="11" r="2.6" fill="#101b30"/>
+        </svg>
+        <span class="brand-name">TransitOps</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="nav-item">
+          <i class="fa-solid fa-gauge"></i> Dashboard
+        </a>
+        <a href="/fleet" class="nav-item">
+          <i class="fa-solid fa-truck"></i> Fleet
+        </a>
+        <a href="/drivers" class="nav-item">
+          <i class="fa-solid fa-id-card"></i> Drivers
+        </a>
+        <a href="/trips" class="nav-item active">
+          <i class="fa-solid fa-route"></i> Trips
+        </a>
+        <a href="/maintenance" class="nav-item">
+          <i class="fa-solid fa-screwdriver-wrench"></i> Maintenance
+        </a>
+        <a href="/fuel-expenses" class="nav-item">
+          <i class="fa-solid fa-gas-pump"></i> Fuel &amp; Expenses
+        </a>
+        <a href="/analytics" class="nav-item">
+          <i class="fa-solid fa-chart-line"></i> Analytics
+        </a>
+        <a href="/settings" class="nav-item">
+          <i class="fa-solid fa-gear"></i> Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="dash-main">
+
+      <header class="topbar">
+        <div class="topbar-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search trips…" id="tripSearch" />
+        </div>
+
+        <div class="topbar-right">
+          <button class="icon-btn" title="Notifications">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+          <div class="user-block">
+            <span class="user-name" id="userName">—</span>
+            <span class="status-pill" id="connectionStatus">
+              <span class="status-dot"></span> Connecting…
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="dash-content">
+
+        <div class="content-header content-header-row">
+          <h1>Trip Dispatcher</h1>
+        </div>
+
+        <!-- Trip lifecycle stepper -->
+        <div class="lifecycle-wrap">
+          <span class="lifecycle-label">Trip Lifecycle</span>
+          <div class="lifecycle-stepper" id="lifecycleStepper">
+            <div class="lifecycle-step" data-step="Draft">
+              <span class="lifecycle-dot"></span>
+              <span class="lifecycle-name">Draft</span>
+            </div>
+            <div class="lifecycle-line"></div>
+            <div class="lifecycle-step" data-step="Dispatched">
+              <span class="lifecycle-dot"></span>
+              <span class="lifecycle-name">Dispatched</span>
+            </div>
+            <div class="lifecycle-line"></div>
+            <div class="lifecycle-step" data-step="Completed">
+              <span class="lifecycle-dot"></span>
+              <span class="lifecycle-name">Completed</span>
+            </div>
+            <div class="lifecycle-line"></div>
+            <div class="lifecycle-step" data-step="Cancelled">
+              <span class="lifecycle-dot"></span>
+              <span class="lifecycle-name">Cancelled</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="trips-layout">
+
+          <!-- Create Trip -->
+          <section class="panel create-trip-panel">
+            <div class="panel-header">
+              <h2>Create Trip</h2>
+            </div>
+
+            <form id="createTripForm" class="modal-body trip-form">
+              <div class="form-row">
+                <label for="tripSource">Source</label>
+                <input type="text" id="tripSource" required placeholder="e.g. Gandhinagar Depot" />
+              </div>
+
+              <div class="form-row">
+                <label for="tripDestination">Destination</label>
+                <input type="text" id="tripDestination" required placeholder="e.g. Ahmedabad Hub" />
+              </div>
+
+              <div class="form-row">
+                <label for="tripVehicle">Vehicle (Available only)</label>
+                <select id="tripVehicle" required>
+                  <option value="">Loading vehicles…</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label for="tripDriver">Driver (Available only)</label>
+                <select id="tripDriver" required>
+                  <option value="">Loading drivers…</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label for="cargoWeight">Cargo Weight (kg)</label>
+                <input type="number" id="cargoWeight" min="0" required placeholder="e.g. 700" />
+              </div>
+
+              <div class="form-row">
+                <label for="tripDistance">Est. Trip Distance (km)</label>
+                <input type="number" id="tripDistance" min="0" step="0.1" placeholder="e.g. 35" />
+              </div>
+
+              <div class="capacity-box" id="capacityBox" hidden>
+                <div id="capacityDetails"></div>
+              </div>
+
+              <p class="form-error" id="tripFormError"></p>
+
+              <div class="modal-footer trip-form-footer">
+                <button type="submit" class="btn-primary" id="dispatchTripBtn" disabled>
+                  Dispatch (disabled)
+                </button>
+                <button type="button" class="btn-secondary" id="cancelTripFormBtn">Cancel</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Live Board -->
+          <section class="panel live-board-panel">
+            <div class="panel-header">
+              <h2>Live Board</h2>
+            </div>
+            <div class="live-board" id="liveBoard">
+              <div class="status-empty">Loading trips…</div>
+            </div>
+          </section>
+
+        </div>
+
+        <p class="table-note lifecycle-footnote">
+          On Complete: odometer → fuel log → expenses → vehicle &amp; driver available.
+        </p>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/trips.js"></script>
+</body>
+</html>
