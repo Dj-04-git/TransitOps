@@ -19,6 +19,7 @@ import publicApiRoutes from "./routes/publicApiRoutes.js";
 import fleetManagerRoutes from "./routes/fleetManagerRoutes.js";
 import driversRoutes from "./routes/driversRoutes.js";
 import driverRoutes from "./routes/driverRoutes.js";
+import maintenanceController from "./controllers/maintenanceController.js";
 import safetyOfficerRoutes from "./routes/safetyOfficerRoutes.js";
 import financialAnalystRoutes from "./routes/financialAnalystRoutes.js";
 
@@ -147,28 +148,15 @@ app.post("/api/fuel", async (req, res) => {
 });
 
 app.get("/api/maintenance", async (req, res) => {
-  try {
-    const result = await db.query(`
-      SELECT
-        m.id,
-        m.vehicle_id,
-        v.registration_number AS "vehicleName",
-        m.service_type,
-        m.cost,
-        m.started_at,
-        m.completed_at,
-        m.status,
-        m.created_at
-      FROM maintenance_logs m
-      LEFT JOIN vehicles v ON v.id = m.vehicle_id
-      ORDER BY m.created_at DESC, m.id DESC
-    `);
+  return maintenanceController.getMaintenanceLogs(req, res);
+});
 
-    return res.json({ maintenanceLogs: result.rows });
-  } catch (error) {
-    console.error("Fetch maintenance logs error:", error);
-    return res.status(500).json({ success: false, message: "Failed to load maintenance logs" });
-  }
+app.post("/api/maintenance", async (req, res) => {
+  return maintenanceController.createMaintenanceLog(req, res);
+});
+
+app.patch("/api/maintenance/:id/close", async (req, res) => {
+  return maintenanceController.closeMaintenanceLog(req, res);
 });
 
 app.get("/api/expenses", async (req, res) => {

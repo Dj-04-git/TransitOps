@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Maintenance · TransitOps</title>
   <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/fleet.css" />
   <link rel="stylesheet" href="/css/maintenance.css" />
   <link
     rel="stylesheet"
@@ -80,97 +81,94 @@
 
       <main class="dash-content">
 
-        <div class="content-header">
-          <h1>Maintenance</h1>
+        <div class="content-header content-header-row">
+          <div>
+            <h1>Maintenance</h1>
+            <p class="page-subtitle">Review the service log first, then add a new maintenance record when needed.</p>
+          </div>
+          <button class="btn-primary" id="createMaintenanceBtn">
+            <i class="fa-solid fa-plus"></i> New Service Log
+          </button>
         </div>
 
-        <section class="panels-row maintenance-row">
-
-          <!-- Log Service Record -->
-          <div class="panel panel-form">
-            <div class="panel-header">
-              <h2>Log Service Record</h2>
-            </div>
-
-            <form id="maintenanceForm" class="maintenance-form">
-              <div id="formError" class="form-error" hidden></div>
-
-              <div class="form-group">
-                <label for="vehicleSelect">Vehicle</label>
-                <select id="vehicleSelect" required>
-                  <option value="">Loading vehicles…</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="serviceType">Service Type</label>
-                <input type="text" id="serviceType" placeholder="e.g. Oil Change" required />
-              </div>
-
-              <div class="form-group">
-                <label for="serviceCost">Cost</label>
-                <input type="number" id="serviceCost" min="0" step="0.01" placeholder="e.g. 2500" required />
-              </div>
-
-              <div class="form-group">
-                <label for="serviceDate">Date</label>
-                <input type="date" id="serviceDate" required />
-              </div>
-
-              <div class="form-group">
-                <label for="serviceStatus">Status</label>
-                <select id="serviceStatus">
-                  <option value="Open" selected>Open</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </div>
-
-              <button type="submit" class="btn-save" id="saveBtn">Save</button>
-            </form>
-
-            <div class="workflow-note">
-              <div class="workflow-line">
-                <span class="wf-available">Available</span>
-                <span class="wf-arrow">&#8594;</span>
-                <span class="wf-inshop">In Shop</span>
-                <span class="wf-caption">on logging a service record</span>
-              </div>
-              <div class="workflow-line">
-                <span class="wf-inshop">In Shop</span>
-                <span class="wf-arrow">&#8594;</span>
-                <span class="wf-available">Available</span>
-                <span class="wf-caption">on closing a service record</span>
-              </div>
-              <p class="workflow-footnote">Note: In Shop vehicles are removed from the dispatch pool.</p>
-            </div>
+        <section class="panel panel-log">
+          <div class="panel-header">
+            <h2>Service Logs</h2>
+            <span class="panel-chip" id="maintenanceCountChip">Loading…</span>
           </div>
-
-          <!-- Service Log -->
-          <div class="panel panel-log">
-            <div class="panel-header">
-              <h2>Service Log</h2>
-            </div>
-            <table class="trips-table">
-              <thead>
-                <tr>
-                  <th>Vehicle</th>
-                  <th>Service</th>
-                  <th>Cost</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="serviceLogBody">
-                <tr class="table-loading-row">
-                  <td colspan="5">Loading service log…</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
+          <table class="trips-table">
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th>Service</th>
+                <th>Cost</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="serviceLogBody">
+              <tr class="table-loading-row">
+                <td colspan="5">Loading service log…</td>
+              </tr>
+            </tbody>
+          </table>
         </section>
 
+        <p class="table-note">
+          Available vehicles are loaded from the live API. Closing a service log returns the vehicle to available.
+        </p>
+
       </main>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="maintenanceModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="maintenanceModalTitle">Log Service Record</h2>
+        <button class="icon-btn" id="closeMaintenanceModal" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="maintenanceForm" class="modal-body maintenance-form">
+        <div id="formError" class="form-error" hidden></div>
+
+        <div class="form-group">
+          <label for="vehicleSelect">Vehicle</label>
+          <select id="vehicleSelect" required>
+            <option value="">Loading vehicles…</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="serviceType">Service Type</label>
+          <input type="text" id="serviceType" placeholder="e.g. Oil Change" required />
+        </div>
+
+        <div class="form-group">
+          <label for="serviceCost">Cost</label>
+          <input type="number" id="serviceCost" min="0" step="0.01" placeholder="e.g. 2500" required />
+        </div>
+
+        <div class="form-group">
+          <label for="serviceDate">Date</label>
+          <input type="date" id="serviceDate" required />
+        </div>
+
+        <div class="form-group">
+          <label for="serviceStatus">Status</label>
+          <select id="serviceStatus">
+            <option value="open" selected>Open</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelMaintenanceModal">Cancel</button>
+          <button type="submit" class="btn-save" id="saveBtn">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 

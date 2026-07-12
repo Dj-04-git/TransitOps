@@ -1,48 +1,37 @@
-/* ============================================
-   TransitOps — Maintenance page loader
-   Fetches from /api/maintenance (log) and
-   /api/fleet (vehicle list for the form select).
-   No values are hardcoded — everything renders
-   from the API response.
-
-   ADJUST TO MATCH YOUR API if your endpoint
-   paths or field names differ:
-     - VEHICLE_LIST_URL
-     - SERVICE_LOG_URL
-     - field names inside vehicleOptionHTML()
-       and serviceLogRowHTML()
-   ============================================ */
-
-const VEHICLE_LIST_URL = '/api/fleet?status=Available';
+const VEHICLE_LIST_URL = '/api/vehicles/available';
 const SERVICE_LOG_URL = '/api/maintenance';
+
+let maintenanceRecords = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   loadSession();
-  loadVehicles();
+  loadAvailableVehicles();
   loadServiceLog();
 
-  document.getElementById('maintenanceForm')
-    .addEventListener('submit', handleCreateRecord);
+  document.getElementById('createMaintenanceBtn').addEventListener('click', openMaintenanceModal);
+  document.getElementById('closeMaintenanceModal').addEventListener('click', closeMaintenanceModal);
+  document.getElementById('cancelMaintenanceModal').addEventListener('click', closeMaintenanceModal);
+  document.getElementById('maintenanceModalOverlay').addEventListener('click', (event) => {
+    if (event.target.id === 'maintenanceModalOverlay') closeMaintenanceModal();
+  });
 
-  // default the date field to today, without hardcoding a value in HTML
-  const dateInput = document.getElementById('serviceDate');
-  dateInput.value = new Date().toISOString().slice(0, 10);
+  document.getElementById('maintenanceForm').addEventListener('submit', handleCreateRecord);
+  document.getElementById('maintenanceSearch').addEventListener('input', renderServiceLog);
+  document.getElementById('serviceDate').value = new Date().toISOString().slice(0, 10);
 });
-
-/* ---------- Helpers ---------- */
 
 async function fetchJSON(url, options) {
   const res = await fetch(url, options);
   const json = await res.json().catch(() => null);
   if (!res.ok || !json || json.success === false) {
-    throw new Error((json && json.message) || `Request failed: ${res.status}`);
+    throw new Error((json && (json.message || json.error)) || `Request failed: ${res.status}`);
   }
   return json;
 }
 
 function escapeHTML(str) {
   return String(str ?? '').replace(/[&<>"']/g, (c) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[c]));
 }
 
@@ -52,13 +41,17 @@ function formatCurrency(value) {
   return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
-/* ---------- Session / connection status (same as dashboard) ---------- */
+function formatStatusLabel(status) {
+  return String(status ?? '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
 
 function loadSession() {
   const nameEl = document.getElementById('userName');
   const statusEl = document.getElementById('connectionStatus');
-
   const storedUser = localStorage.getItem('userName');
+
   nameEl.textContent = storedUser || 'Guest';
 
   if (storedUser) {
@@ -70,18 +63,22 @@ function loadSession() {
   }
 }
 
-/* ---------- Vehicle select (for logging a new record) ---------- */
+function openMaintenanceModal() {
+  document.getElementById('maintenanceModalOverlay').classList.add('open');
+}
 
-async function loadVehicles() {
+function closeMaintenanceModal() {
+  document.getElementById('maintenanceModalOverlay').classList.remove('open');
+}
+
+async function loadAvailableVehicles() {
   const select = document.getElementById('vehicleSelect');
 
   try {
     const json = await fetchJSON(VEHICLE_LIST_URL);
+    const vehicles = json?.data?.vehicles || json.vehicles || [];
 
-    // adjust to match your API: expects { success, data: { vehicles: [...] } }
-    const vehicles = (json.data && json.data.vehicles) || [];
-
-    if (vehicles.length === 0) {
+    if (!vehicles.length) {
       select.innerHTML = '<option value="">No available vehicles</option>';
       return;
     }
@@ -95,61 +92,65 @@ async function loadVehicles() {
 
 function vehicleOptionHTML(vehicle) {
   const id = vehicle.id || vehicle._id;
-  const label = vehicle.registrationNumber || vehicle.name || id;
+  const label = vehicle.registration_number || vehicle.registrationNumber || vehicle.name || id;
   return `<option value="${escapeHTML(id)}">${escapeHTML(label)}</option>`;
 }
 
-/* ---------- Service log table ---------- */
-
 async function loadServiceLog() {
-  const tbody = document.getElementById('serviceLogBody');
-
   try {
     const json = await fetchJSON(SERVICE_LOG_URL);
-
-    // adjust to match your API: expects { success, data: { records: [...] } }
-    const records = (json.data && json.data.records) || [];
-
-    if (records.length === 0) {
-      tbody.innerHTML = `<tr class="table-empty-row"><td colspan="5">No service records yet.</td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = records.map(serviceLogRowHTML).join('');
-
-    tbody.querySelectorAll('[data-close-id]').forEach((btn) => {
-      btn.addEventListener('click', () => handleCloseRecord(btn.dataset.closeId, btn));
-    });
+    maintenanceRecords = json?.data?.records || json.maintenanceLogs || [];
+    renderServiceLog();
   } catch (err) {
     console.error('Failed to load service log:', err);
-    tbody.innerHTML = `<tr class="table-empty-row"><td colspan="5">Couldn't load the service log.</td></tr>`;
+    maintenanceRecords = [];
+    renderServiceLog();
   }
+}
+
+function renderServiceLog() {
+  const tbody = document.getElementById('serviceLogBody');
+  const chip = document.getElementById('maintenanceCountChip');
+  const query = document.getElementById('maintenanceSearch').value.trim().toLowerCase();
+
+  const records = maintenanceRecords.filter((record) => {
+    if (!query) return true;
+    return [record.id, record.vehicleName, record.service_type, record.status]
+      .some((value) => String(value ?? '').toLowerCase().includes(query));
+  });
+
+  chip.textContent = `${records.length} record${records.length === 1 ? '' : 's'}`;
+
+  if (!records.length) {
+    tbody.innerHTML = '<tr class="table-empty-row"><td colspan="5">No service records yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = records.map(serviceLogRowHTML).join('');
+
+  tbody.querySelectorAll('[data-close-id]').forEach((btn) => {
+    btn.addEventListener('click', () => handleCloseRecord(btn.dataset.closeId, btn));
+  });
 }
 
 function serviceLogRowHTML(record) {
   const id = record.id || record._id;
-  const vehicleLabel = (record.vehicle && (record.vehicle.registrationNumber || record.vehicle.name))
+  const vehicleLabel = (record.vehicle && (record.vehicle.registration_number || record.vehicle.registrationNumber || record.vehicle.name))
     || record.vehicleName || '—';
-  const status = record.status || 'Open';
+  const status = record.status || 'active';
   const statusClass = String(status).toLowerCase().replace(/\s+/g, '-');
-  const isOpen = statusClass === 'open' || statusClass === 'in-shop';
+  const isOpen = statusClass === 'active' || statusClass === 'open';
 
   return `
     <tr>
       <td>${escapeHTML(vehicleLabel)}</td>
-      <td>${escapeHTML(record.serviceType)}</td>
+      <td>${escapeHTML(record.service_type || record.serviceType)}</td>
       <td>${formatCurrency(record.cost)}</td>
-      <td><span class="trip-status ${statusClass}">${escapeHTML(status)}</span></td>
-      <td>
-        ${isOpen
-          ? `<button class="btn-close-record" data-close-id="${escapeHTML(id)}">Close</button>`
-          : ''}
-      </td>
+      <td><span class="trip-status ${statusClass}">${escapeHTML(formatStatusLabel(status))}</span></td>
+      <td>${isOpen ? `<button class="btn-close-record" data-close-id="${escapeHTML(id)}">Close</button>` : ''}</td>
     </tr>
   `;
 }
-
-/* ---------- Create a service record ---------- */
 
 async function handleCreateRecord(e) {
   e.preventDefault();
@@ -159,14 +160,14 @@ async function handleCreateRecord(e) {
   errorBox.hidden = true;
 
   const payload = {
-    vehicle: document.getElementById('vehicleSelect').value,
-    serviceType: document.getElementById('serviceType').value.trim(),
+    vehicle_id: document.getElementById('vehicleSelect').value,
+    service_type: document.getElementById('serviceType').value.trim(),
     cost: Number(document.getElementById('serviceCost').value),
-    date: document.getElementById('serviceDate').value,
+    started_at: document.getElementById('serviceDate').value,
     status: document.getElementById('serviceStatus').value,
   };
 
-  if (!payload.vehicle) {
+  if (!payload.vehicle_id) {
     errorBox.textContent = 'Select a vehicle before saving.';
     errorBox.hidden = false;
     return;
@@ -184,8 +185,9 @@ async function handleCreateRecord(e) {
 
     document.getElementById('maintenanceForm').reset();
     document.getElementById('serviceDate').value = new Date().toISOString().slice(0, 10);
+    closeMaintenanceModal();
 
-    await Promise.all([loadServiceLog(), loadVehicles()]);
+    await Promise.all([loadServiceLog(), loadAvailableVehicles()]);
   } catch (err) {
     console.error('Failed to create service record:', err);
     errorBox.textContent = err.message || 'Could not save this record.';
@@ -196,15 +198,13 @@ async function handleCreateRecord(e) {
   }
 }
 
-/* ---------- Close a service record ---------- */
-
 async function handleCloseRecord(id, btn) {
   btn.disabled = true;
   btn.textContent = '…';
 
   try {
     await fetchJSON(`${SERVICE_LOG_URL}/${id}/close`, { method: 'PATCH' });
-    await Promise.all([loadServiceLog(), loadVehicles()]);
+    await Promise.all([loadServiceLog(), loadAvailableVehicles()]);
   } catch (err) {
     console.error('Failed to close service record:', err);
     btn.disabled = false;
