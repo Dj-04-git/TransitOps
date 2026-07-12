@@ -16,6 +16,7 @@ import db, { initDatabase } from "./db.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import fleetManagerRoutes from "./routes/fleetManagerRoutes.js";
+import driversRoutes from "./routes/driversRoutes.js";
 import driverRoutes from "./routes/driverRoutes.js";
 import safetyOfficerRoutes from "./routes/safetyOfficerRoutes.js";
 import financialAnalystRoutes from "./routes/financialAnalystRoutes.js";
@@ -35,6 +36,7 @@ app.use(express.static(path.join(__dirname, "pages")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/fleet-manager", fleetManagerRoutes);
+app.use("/api/drivers", driversRoutes);
 app.use("/api/driver", driverRoutes);
 app.use("/api/safety-officer", safetyOfficerRoutes);
 app.use("/api/financial-analyst", financialAnalystRoutes);
