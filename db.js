@@ -43,9 +43,46 @@ const ensureUserSchema = async () => {
   `);
 };
 
+const ensureVehicleSchema = async () => {
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1
+        FROM pg_type t
+        JOIN pg_namespace n ON n.oid = t.typnamespace
+        WHERE t.typname = 'vehicle_status'
+          AND n.nspname = 'public'
+      ) THEN
+        CREATE TYPE vehicle_status AS ENUM (
+          'available',
+          'on_trip',
+          'in_shop',
+          'retired'
+        );
+      END IF;
+    END
+    $$;
+
+    CREATE TABLE IF NOT EXISTS vehicles (
+      id BIGSERIAL PRIMARY KEY,
+      registration_number VARCHAR(32) NOT NULL UNIQUE,
+      name VARCHAR(120) NOT NULL,
+      vehicle_type VARCHAR(50) NOT NULL,
+      load_capacity VARCHAR(32) NOT NULL,
+      odometer INTEGER NOT NULL DEFAULT 0,
+      avg_cost NUMERIC(12, 2) NOT NULL DEFAULT 0,
+      status vehicle_status NOT NULL DEFAULT 'available',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
+};
+
 export const initDatabase = async () => {
   await pool.query("SELECT 1");
   await ensureUserSchema();
+  await ensureVehicleSchema();
 };
 
 pool.on("error", (error) => {

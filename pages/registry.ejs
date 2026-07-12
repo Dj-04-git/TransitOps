@@ -1,0 +1,354 @@
+<%- include('partials/head', { title: 'Vehicle Registry · TransitOps' }) %>
+
+<body class="min-h-screen bg-base-200 text-base-content">
+  <%- include('partials/navbar', { active: 'fleet' }) %>
+
+  <main id="registryShell" class="hidden container mx-auto max-w-7xl px-6 py-8 lg:py-12">
+    <section class="space-y-8">
+      <div class="space-y-3">
+        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-base-content/50">●──────── FLEET / VEHICLES</p>
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h1 class="text-4xl font-black tracking-tight">Vehicle Registry</h1>
+            <p class="mt-2 max-w-3xl text-base leading-7 text-base-content/70">
+              View registered fleet assets, their operating status, and the values stored in PostgreSQL.
+            </p>
+          </div>
+          <button class="btn btn-primary" onclick="document.getElementById('vehicleModal').showModal()">
+            Add vehicle
+          </button>
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-4">
+        <div class="rounded-box border border-base-300 bg-base-100 p-5 border-l-4 border-l-success">
+          <p class="text-xs font-semibold uppercase tracking-widest text-base-content/50">Available</p>
+          <p id="availableCount" class="data-value mt-3 text-3xl font-bold">0</p>
+        </div>
+        <div class="rounded-box border border-base-300 bg-base-100 p-5 border-l-4 border-l-info">
+          <p class="text-xs font-semibold uppercase tracking-widest text-base-content/50">On trip</p>
+          <p id="onTripCount" class="data-value mt-3 text-3xl font-bold">0</p>
+        </div>
+        <div class="rounded-box border border-base-300 bg-base-100 p-5 border-l-4 border-l-warning">
+          <p class="text-xs font-semibold uppercase tracking-widest text-base-content/50">In shop</p>
+          <p id="inShopCount" class="data-value mt-3 text-3xl font-bold">0</p>
+        </div>
+        <div class="rounded-box border border-base-300 bg-base-100 p-5 border-l-4 border-l-neutral">
+          <p class="text-xs font-semibold uppercase tracking-widest text-base-content/50">Retired</p>
+          <p id="retiredCount" class="data-value mt-3 text-3xl font-bold">0</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <label class="input input-bordered flex w-full items-center gap-2 lg:max-w-md">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4 opacity-50"><path fill="currentColor" d="M10 18a8 8 0 1 1 0-16a8 8 0 0 1 0 16m6.32-1.9l4.58 4.58l-1.41 1.41l-4.58-4.58z"/></svg>
+          <input id="searchInput" type="search" placeholder="Search reg no, name, or type..." class="grow" />
+        </label>
+        <div class="flex flex-wrap gap-3">
+          <select id="statusFilter" class="select select-bordered">
+            <option value="">All status</option>
+            <option value="available">Available</option>
+            <option value="on_trip">On trip</option>
+            <option value="in_shop">In shop</option>
+            <option value="retired">Retired</option>
+          </select>
+          <select id="typeFilter" class="select select-bordered">
+            <option value="">All types</option>
+            <option value="Van">Van</option>
+            <option value="Bus">Bus</option>
+            <option value="Truck">Truck</option>
+            <option value="Mini">Mini</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="registryAlert" class="alert hidden"></div>
+
+      <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+        <table class="table">
+          <thead>
+            <tr class="uppercase tracking-widest text-base-content/50">
+              <th>Reg. no.</th>
+              <th>Name / Model</th>
+              <th>Type</th>
+              <th>Load capacity</th>
+              <th>Odometer</th>
+              <th>Avg. cost</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleTableBody">
+            <tr>
+              <td colspan="7" class="py-10 text-center text-base-content/60">Loading vehicles...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="vehicleModal" class="modal">
+    <div class="modal-box max-w-2xl rounded-box border border-base-300 bg-base-100">
+      <h3 class="text-2xl font-black tracking-tight">Add vehicle</h3>
+      <p class="mt-2 text-sm leading-6 text-base-content/70">Create a new record in the vehicles table.</p>
+
+      <form id="vehicleForm" class="mt-6 grid gap-4 md:grid-cols-2">
+        <label class="form-control w-full">
+          <div class="label"><span class="label-text font-semibold">Registration number</span></div>
+          <input name="registrationNumber" class="input input-bordered w-full" placeholder="GJ01AB4521" required />
+        </label>
+
+        <label class="form-control w-full">
+          <div class="label"><span class="label-text font-semibold">Name / model</span></div>
+          <input name="name" class="input input-bordered w-full" placeholder="VAN-05" required />
+        </label>
+
+        <label class="form-control w-full">
+          <div class="label"><span class="label-text font-semibold">Vehicle type</span></div>
+          <input name="vehicleType" class="input input-bordered w-full" placeholder="Van" required />
+        </label>
+
+        <label class="form-control w-full">
+          <div class="label"><span class="label-text font-semibold">Load capacity</span></div>
+          <input name="loadCapacity" class="input input-bordered w-full" placeholder="500 kg" required />
+        </label>
+
+        <label class="form-control w-full">
+          <div class="label"><span class="label-text font-semibold">Odometer</span></div>
+          <input name="odometer" type="number" min="0" class="input input-bordered w-full" value="0" required />
+        </label>
+
+        <label class="form-control w-full">
+          <div class="label"><span class="label-text font-semibold">Avg. cost</span></div>
+          <input name="avgCost" type="number" min="0" step="0.01" class="input input-bordered w-full" value="0" required />
+        </label>
+
+        <label class="form-control w-full md:col-span-2">
+          <div class="label"><span class="label-text font-semibold">Status</span></div>
+          <select name="status" class="select select-bordered w-full" required>
+            <option value="available">Available</option>
+            <option value="on_trip">On trip</option>
+            <option value="in_shop">In shop</option>
+            <option value="retired">Retired</option>
+          </select>
+        </label>
+
+        <div class="modal-action md:col-span-2">
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('vehicleModal').close()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save vehicle</button>
+        </div>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
+
+  <script>
+    const token = localStorage.getItem('transitops_token');
+    const registryShell = document.getElementById('registryShell');
+    const vehicleTableBody = document.getElementById('vehicleTableBody');
+    const registryAlert = document.getElementById('registryAlert');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const typeFilter = document.getElementById('typeFilter');
+    const vehicleForm = document.getElementById('vehicleForm');
+    const vehicleModal = document.getElementById('vehicleModal');
+    const stats = {
+      available: document.getElementById('availableCount'),
+      on_trip: document.getElementById('onTripCount'),
+      in_shop: document.getElementById('inShopCount'),
+      retired: document.getElementById('retiredCount')
+    };
+
+    let vehicles = [];
+
+    const statusLabel = {
+      available: 'Available',
+      on_trip: 'On Trip',
+      in_shop: 'In Shop',
+      retired: 'Retired'
+    };
+
+    const statusBadge = {
+      available: 'badge-success',
+      on_trip: 'badge-info',
+      in_shop: 'badge-warning',
+      retired: 'badge-neutral'
+    };
+
+    const showAlert = (message, type) => {
+      registryAlert.className = `alert ${type === 'error' ? 'alert-error' : 'alert-success'}`;
+      registryAlert.textContent = message;
+      registryAlert.classList.remove('hidden');
+    };
+
+    const redirectToLogin = () => {
+      window.location.href = '/login';
+    };
+
+    const verifyFleetManagerAccess = async () => {
+      if (!token) {
+        redirectToLogin();
+        return false;
+      }
+
+      try {
+        const response = await fetch('/api/auth/me', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          redirectToLogin();
+          return false;
+        }
+
+        const data = await response.json();
+
+        if (data?.user?.role !== 'fleet_manager') {
+          redirectToLogin();
+          return false;
+        }
+
+        registryShell.classList.remove('hidden');
+        return true;
+      } catch {
+        redirectToLogin();
+        return false;
+      }
+    };
+
+    const formatCurrency = (value) => {
+      const number = Number(value || 0);
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 2
+      }).format(number);
+    };
+
+    const renderStats = (items) => {
+      const counts = { available: 0, on_trip: 0, in_shop: 0, retired: 0 };
+      items.forEach((item) => {
+        if (counts[item.status] !== undefined) {
+          counts[item.status] += 1;
+        }
+      });
+
+      Object.entries(counts).forEach(([key, value]) => {
+        stats[key].textContent = value;
+      });
+    };
+
+    const renderRows = (items) => {
+      if (!items.length) {
+        vehicleTableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-10 text-center text-base-content/60">No vehicles found.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      vehicleTableBody.innerHTML = items.map((vehicle) => `
+        <tr class="hover:bg-base-200/60">
+          <td class="font-mono text-sm font-semibold">${vehicle.registration_number}</td>
+          <td>${vehicle.name}</td>
+          <td>${vehicle.vehicle_type}</td>
+          <td>${vehicle.load_capacity}</td>
+          <td class="font-mono text-sm">${Number(vehicle.odometer).toLocaleString('en-IN')} km</td>
+          <td class="font-mono text-sm">${formatCurrency(vehicle.avg_cost)}</td>
+          <td><span class="badge ${statusBadge[vehicle.status] || 'badge-ghost'} badge-soft">${statusLabel[vehicle.status] || vehicle.status}</span></td>
+        </tr>
+      `).join('');
+    };
+
+    const applyFilters = () => {
+      const query = searchInput.value.trim().toLowerCase();
+      const status = statusFilter.value;
+      const type = typeFilter.value;
+
+      const filtered = vehicles.filter((vehicle) => {
+        const matchesQuery = !query || [vehicle.registration_number, vehicle.name, vehicle.vehicle_type]
+          .join(' ')
+          .toLowerCase()
+          .includes(query);
+        const matchesStatus = !status || vehicle.status === status;
+        const matchesType = !type || vehicle.vehicle_type === type;
+        return matchesQuery && matchesStatus && matchesType;
+      });
+
+      renderRows(filtered);
+    };
+
+    const loadVehicles = async () => {
+      const hasAccess = await verifyFleetManagerAccess();
+      if (!hasAccess) {
+        vehicleTableBody.innerHTML = '<tr><td colspan="7" class="py-10 text-center text-base-content/60">Redirecting to login...</td></tr>';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/fleet-manager/vehicles', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load vehicles');
+        }
+
+        vehicles = data.vehicles || [];
+        renderStats(vehicles);
+        applyFilters();
+      } catch (error) {
+        showAlert(error.message, 'error');
+        vehicleTableBody.innerHTML = '<tr><td colspan="7" class="py-10 text-center text-base-content/60">Unable to load vehicles.</td></tr>';
+      }
+    };
+
+    searchInput.addEventListener('input', applyFilters);
+    statusFilter.addEventListener('change', applyFilters);
+    typeFilter.addEventListener('change', applyFilters);
+
+    vehicleForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      try {
+        const formData = new FormData(vehicleForm);
+        const payload = Object.fromEntries(formData.entries());
+
+        const response = await fetch('/api/fleet-manager/vehicles', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to create vehicle');
+        }
+
+        showAlert('Vehicle added successfully.', 'success');
+        vehicleModal.close();
+        vehicleForm.reset();
+        vehicleForm.status.value = 'available';
+        await loadVehicles();
+      } catch (error) {
+        showAlert(error.message, 'error');
+      }
+    });
+
+    loadVehicles();
+  </script>
+</body>
+</html>
